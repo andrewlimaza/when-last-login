@@ -3,7 +3,7 @@
 Plugin Name: When Last Login
 Plugin URI: https://wordpress.org/plugins/when-last-login/
 Description: Adds functionality to your WordPress install to show when a user last logged in.
-Version: 0.1
+Version: 0.2
 Author: Arctek Technologies (Pty) Ltd
 Author URI: http://www.whenlastlogin.com
 Text Domain: when-last
@@ -93,7 +93,7 @@ class When_Last_Login {
       return $columns;
      }
 
-    function sort_by_login_date( $query ) {
+    public static function sort_by_login_date( $query ) {
       if ( 'when_last_login' == $query->get( 'orderby' ) ) {
         $query->set( 'orderby', 'meta_value_num' );
         $query->set( 'meta_key', 'when_last_login');
@@ -104,12 +104,18 @@ class When_Last_Login {
      * Support for Paid Memberships Pro
      */
      public static function pmpro_memberlist_add_header( $users ){
+       if( !defined('PMPRO_VERSION') ){
+         return;
+       }
 ?>
       <th><?php _e( 'Last Login', 'when-last' );?></th>
 <?php
      }
 
      public static function pmpro_memberlist_add_column_data( $users ){
+       if( !defined('PMPRO_VERSION') ){
+         return;
+       }
 ?>
       <td>
 <?php

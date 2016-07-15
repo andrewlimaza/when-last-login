@@ -4,7 +4,7 @@ Tags: last login, user login, user login time, last logged in, last seen, user l
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
 Requires at least: 4.5
 Tested up to: 4.5.3
-Stable tag: trunk
+Stable tag: 0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,7 +58,9 @@ Yes, When Last is free. We are looking into possibilities of creating a Pro vers
 We decided at this point in time (v0.1) that there is no need for a settings page as this plugin is lightweight and does not need configuration. 
 
 = I have installed When Last but users are showing "Never" under "Last Login"? =
-This is because users have not logged in since you have activated "When Last Login". By default we set the "Last Login" to "Never" but this can be easily changed. Once a user logs into your site, their profile will be updated from "Never" to a timestamp. If you need assistance, please open up a support thread.
+This is because users have not logged in since you have activated "When Last Login". By default we set the "Last Login" to "Never" but this can be easily changed. Once a user logs into your site, their profile will be updated from "Never" to a timestamp.
+
+If you need assistance, please open up a support thread.
 
 
 == Screenshots ==
@@ -66,11 +68,16 @@ This is because users have not logged in since you have activated "When Last Log
 
 
 == Changelog ==
+= 0.2 =
+* Bug Fixes: fixed missing 'static' on function 'sort_by_login_date'
+* Error Handling: Check if 'Paid Memberships Pro' is installed, if not return from the function
 
 = 0.1 =
 * First Release
 
 == Upgrade Notice ==
+= 0.2 =
+* Please update When Last Login
 
 = 0.1 =
 * First Release
