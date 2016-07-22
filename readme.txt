@@ -78,6 +78,7 @@ If you need assistance, please open up a support thread.
 = 0.3 =
 * Enhancement: Implemented multi language support and a couple of language files.
 * Language Support: French, Spanish, German and Italian
+
 = 0.2 =
 * Bug Fixes: fixed missing 'static' on function 'sort_by_login_date'
 * Error Handling: Check if 'Paid Memberships Pro' is installed, if not return from the function
