@@ -1,0 +1,46 @@
+# Copyright (C) 2016 When Last Login
+# This file is distributed under the same license as the When Last Login package.
+msgid ""
+msgstr ""
+"Project-Id-Version: When Last Login 0.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/when-last-login\n"
+"POT-Creation-Date: 2016-07-18 12:00+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2016-07-21 13:05+0200\n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.8.8\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: fr\n"
+
+#: when-last-login.php:66 when-last-login.php:111
+msgid "Last Login"
+msgstr "vu en dernier"
+
+#: when-last-login.php:81 when-last-login.php:84 when-last-login.php:125
+msgid "Never"
+msgstr "jamais"
+
+#. Plugin Name of the plugin/theme
+msgid "When Last Login"
+msgstr "Dernière connexion"
+
+#. Plugin URI of the plugin/theme
+msgid "https://wordpress.org/plugins/when-last-login/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Adds functionality to your WordPress install to show when a user last logged "
+"in."
+msgstr "Seulement les utilisateurs authentifiés WordPress"
+
+#. Author of the plugin/theme
+msgid "Arctek Technologies (Pty) Ltd"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://www.whenlastlogin.com"
+msgstr ""

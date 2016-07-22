@@ -3,10 +3,22 @@
 Plugin Name: When Last Login
 Plugin URI: https://wordpress.org/plugins/when-last-login/
 Description: Adds functionality to your WordPress install to show when a user last logged in.
-Version: 0.2
+Version: 0.3
 Author: Arctek Technologies (Pty) Ltd
 Author URI: http://www.whenlastlogin.com
-Text Domain: when-last
+Text Domain: when-last-login
+Domain Path: /languages
+
+  * 0.3 22-07-2016
+  * Enhancement: Implemented multi language support and a couple of language files.
+  * Language Support: French, Spanish, German and Italian
+  *
+  * 0.2 - 15-07-2016
+  * Bug Fixes: fixed missing 'static' on function 'sort_by_login_date'
+  * Error Handling: Check if 'Paid Memberships Pro' is installed, if not return from the function
+  *
+  * 0.1 - 15-07-2016
+  * Initial release
 */
 
 class When_Last_Login {
@@ -18,7 +30,10 @@ class When_Last_Login {
     * Initializes the plugin by setting localization, filters, and administration functions.
     */
     private function __construct() {
+      define('WHEN_LAST_LOGIN_BNAME', plugin_basename(__FILE__));
+
       add_action( 'init', array( 'When_Last_Login', 'init' ));
+      add_action( 'plugins_loaded', array( 'When_Last_Login', 'text_domain' ));
 
       //Create the custom meta upon login
       add_action( 'wp_login', array( 'When_Last_Login', 'last_login'), 10, 2);
@@ -54,6 +69,10 @@ class When_Last_Login {
     //init function
     }
 
+    public static function text_domain(){
+      load_plugin_textdomain( 'when-last-login', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+    }
+
      public static function last_login( $user_login, $users ){
        //get/update user meta 'when_last_login' on login and add time() to it.
        update_user_meta( $users->ID, 'when_last_login', time() );
@@ -63,7 +82,7 @@ class When_Last_Login {
      * Setup Column and data for users page with sortable
      */
      public static function column_header( $column ){
-       $column['when_last_login'] = __( 'Last Login', 'when-last' );
+       $column['when_last_login'] = __( 'Last Login', 'when-last-login' );
        return $column;
      }
 
@@ -78,10 +97,10 @@ class When_Last_Login {
         }else{
 
           if(get_the_author_meta('when_last_login', $id) === 0){
-            return __('Never', 'when-last');
+            return __( 'Never', 'when-last-login' );
           }else{
             update_user_meta( $id, 'when_last_login', 0);
-            return __('Never', 'when-last');
+            return __( 'Never', 'when-last-login' );
           }
 
         }
@@ -122,7 +141,7 @@ class When_Last_Login {
       if(!empty( $users->when_last_login )){
         echo human_time_diff( $users->when_last_login );
       }else{
-        return _e('Never', 'when-last');
+        return _e('Never', 'when-last-login');
       }
 ?>
       </td>
