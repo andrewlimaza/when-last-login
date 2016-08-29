@@ -2,9 +2,9 @@
 Contributors: andrewza
 Tags: last login, user login, user login time, last logged in, last seen, user last seen, wordpress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
-Requires at least: 4.5
-Tested up to: 4.5.3
-Stable tag: trunk
+Requires at least: 4.4
+Tested up to: 4.6
+Stable tag: 0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,6 +17,7 @@ A lightweight plugin that allows you to see active users according to their last
 * Show when last a user has logged into your site
 * Sorts users according to last login time stamp (Ascending/Descending)
 * Lightweight, no settings page. Activate your plugin and you're done!
+* Administrator widget for top users according to login statistics
 * Integration with Paid Memberships Pro - Add's a 'Last Logged In' column to the 'Members List'
 
 
@@ -34,6 +35,8 @@ Keep an eye out for updates as this is high priority for us. We appreciate any h
 = Track Your Members Better =
 You are able to track which members login to your site by simply sorting your default user's list according to when last the user was seen in easily readable text such as "X Min/Hours/Days/Weeks/Months/Years".
 
+Newly added - administrator dashboard widget for top users according to their login count. 
+
 = Plugins that When Last Login integrates with =
 Here is a list of plugins we currently support:
 
@@ -43,7 +46,7 @@ Here is a list of plugins we currently support:
 Please note that these features are not guaranteed to be released and may change at our discretion.
 
 * Automatic customizable emails to users that haven't logged into your site after X days/months
-* Keep track of login count per user
+* Keep track of login count per user - COMPLETED
 * Statistics of top logged in users
 * Integration with other plugins
 * Multi language support for most languages (High Priority)
@@ -72,9 +75,13 @@ If you need assistance, please open up a support thread.
 
 == Screenshots ==
 1. When Last Login - User's list custom last login field with sorting according to "Last Login" time.
+2. When Last Login - Show top 3 user login (includes 'administrators' in free version)
 
 
 == Changelog ==
+= 0.4 =
+* Enhancement: Dashboard widget added to display top users with user count.
+
 = 0.3 =
 * Enhancement: Implemented multi language support and a couple of language files.
 * Language Support: French, Spanish, German and Italian
@@ -87,6 +94,9 @@ If you need assistance, please open up a support thread.
 * First Release
 
 == Upgrade Notice ==
+= 0.4 =
+* Please update When Last Login to receive our latest feature. Please report any bugs you find on the support forum!
+
 = 0.3 =
 * Please update When Last Login for language support - please see readme.txt for languages supported
 
