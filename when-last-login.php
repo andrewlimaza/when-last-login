@@ -160,6 +160,7 @@ class When_Last_Login {
 
         }
       }
+      return $value;
      }
 
      public static function column_sortable( $columns ){
