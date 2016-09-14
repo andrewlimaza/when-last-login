@@ -145,7 +145,7 @@ class When_Last_Login {
        $args = array(
           'post_title'    => $users->data->display_name . __(' has logged in at ', 'when-last-login') . date('Y-m-d H:i:s', current_time('timestamp') ),
           'post_status'   => 'publish',
-          'post_author'   => 1,
+          'post_author'   => $users->ID,
           'post_type'     => 'wll_records'
         );
          
