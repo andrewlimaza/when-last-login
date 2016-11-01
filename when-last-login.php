@@ -3,12 +3,15 @@
 Plugin Name: When Last Login
 Plugin URI: https://wordpress.org/plugins/when-last-login/
 Description: Adds functionality to your WordPress install to show when a user last logged in.
-Version: 0.4
+Version: 0.5
 Author: Arctek Technologies (Pty) Ltd
 Author URI: http://www.whenlastlogin.com
 Text Domain: when-last-login
 Domain Path: /languages
 
+  * 0.5
+  * Enhancement: Ability to see which users have logged in and at what times
+  * 
   * 0.4 29-08-206
   * Enhancement: Implemented widgetto display top logged in users
   *
@@ -55,6 +58,7 @@ class When_Last_Login {
       add_action('pmpro_memberslist_extra_cols_header', array( 'When_Last_Login', 'pmpro_memberlist_add_header' ));
       add_action('pmpro_memberslist_extra_cols_body', array('When_Last_Login', 'pmpro_memberlist_add_column_data' ));
 
+      add_action( 'init', array( $this, 'login_record_cp' ) );
     } // end constructor
 
     /**
@@ -74,6 +78,47 @@ class When_Last_Login {
     */
     public static function init(){
     //init function
+    }
+
+    public static function login_record_cp(){
+      $labels = array(
+        'name'               => __( 'Login Records', 'when-last-login' ),
+        'singular_name'      => __( 'Login Record', 'when-last-login' ),
+        'menu_name'          => __( 'Login Records', 'when-last-login' ),
+        'name_admin_bar'     => __( 'Login Record', 'when-last-login' ),
+        'add_new'            => __( 'Add New', 'when-last-login' ),
+        'add_new_item'       => __( 'Add New Login Record', 'when-last-login' ),
+        'new_item'           => __( 'New Login Record', 'when-last-login' ),
+        'edit_item'          => __( 'Edit Login Record', 'when-last-login' ),
+        'view_item'          => __( 'View Login Record', 'when-last-login' ),
+        'all_items'          => __( 'All Login Records', 'when-last-login' ),
+        'search_items'       => __( 'Search Login Records', 'when-last-login' ),
+        'parent_item_colon'  => __( 'Parent Login Records:', 'when-last-login' ),
+        'not_found'          => __( 'No login records found.', 'when-last-login' ),
+        'not_found_in_trash' => __( 'No login records found in Trash.', 'when-last-login' )
+      );
+
+      $args = array(
+        'labels'             => $labels,
+        'description'        => __( 'Description.', 'when-last-login' ),
+        'public'             => false,
+        'publicly_queryable' => false,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'query_var'          => true,
+        'rewrite'            => array( 'slug' => 'when-last-login-records' ),
+        'capability_type'    => 'post',
+        'has_archive'        => true,
+        'hierarchical'       => false,
+        'menu_position'      => null,
+        'supports'           => array( 'title', 'author' ),
+        'capabilities' => array(
+          'create_posts' => false, 
+        ),
+        'map_meta_cap' => true, 
+      );
+
+      register_post_type( 'wll_records', $args );
     }
 
     public static function text_domain(){
@@ -96,6 +141,16 @@ class When_Last_Login {
 
          update_user_meta($users->ID, 'when_last_login_count', $wll_new_value);
        }
+
+       $args = array(
+          'post_title'    => $users->data->display_name . __(' has logged in at ', 'when-last-login') . date('Y-m-d H:i:s', current_time('timestamp') ),
+          'post_status'   => 'publish',
+          'post_author'   => $users->ID,
+          'post_type'     => 'wll_records'
+        );
+         
+        wp_insert_post( $args );
+
      }
 
      /**
