@@ -4,7 +4,7 @@ Tags: last login, user login, user login time, last logged in, last seen, user l
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
 Requires at least: 4.4
 Tested up to: 4.6
-Stable tag: 0.4
+Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,6 +19,7 @@ A lightweight plugin that allows you to see active users according to their last
 * Lightweight, no settings page. Activate your plugin and you're done!
 * Administrator widget for top users according to login statistics
 * Integration with Paid Memberships Pro - Add's a 'Last Logged In' column to the 'Members List'
+* See a more detailed log of user's logins with times under 'Login Records'
 
 
 = When Last in your Language =
@@ -47,9 +48,9 @@ Please note that these features are not guaranteed to be released and may change
 
 * Automatic customizable emails to users that haven't logged into your site after X days/months
 * Keep track of login count per user - COMPLETED
-* Statistics of top logged in users
-* Integration with other plugins
-* Multi language support for most languages (High Priority)
+* Statistics of top logged in users - COMPLETED
+* Integration with other plugins - Works with Paid Memberships Pro
+* View readme for supported languages
 * When Last Filters
 * Show last login details for specific WordPress roles
 
@@ -79,6 +80,14 @@ If you need assistance, please open up a support thread.
 
 
 == Changelog ==
+
+= 0.5 =
+* Enhancement: Ability to see which users have logged in and at what times ( Custom Post Type ) - @jarrydlong
+  
+* Bug Fix: return default value for column data if no data is found - @seagyn
+  
+* Enhancement: Improved code readability
+
 = 0.4 =
 * Enhancement: Dashboard widget added to display top users with user count.
 
@@ -94,6 +103,10 @@ If you need assistance, please open up a support thread.
 * First Release
 
 == Upgrade Notice ==
+
+= 0.5 =
+* Please update When Last Login to receive our latest feature. Please report any bugs you find on the support forum!
+
 = 0.4 =
 * Please update When Last Login to receive our latest feature. Please report any bugs you find on the support forum!
 
