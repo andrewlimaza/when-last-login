@@ -2,8 +2,8 @@
 Contributors: andrewza
 Tags: last login, user login, user login time, last logged in, last seen, user last seen, wordpress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
-Requires at least: 4.4
-Tested up to: 4.6
+Requires at least: 4.0
+Tested up to: 4.7
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,13 +19,13 @@ A lightweight plugin that allows you to see active users according to their last
 * Lightweight, no settings page. Activate your plugin and you're done!
 * Administrator widget for top users according to login statistics
 * Integration with Paid Memberships Pro - Add's a 'Last Logged In' column to the 'Members List'
-* See a more detailed log of user's logins with times under 'Login Records'
+* See a more detailed log of user's logins with times under 'Latest Login Records'
+* Filter 'when_last_login_show_records_table'. Accepts boolean (Show/Hide Latest Login records).
+* Filter 'when_last_login_show_admin_widget'. Accepts boolean (Show/Hide admin widget for top logins).
 
 
 = When Last in your Language =
-We are still currently developing When Last to support multiple languages and need your help, please open a thread on the support forum with a subject as 'Translating: DE' or your language code of choice. 
-
-Keep an eye out for updates as this is high priority for us. We appreciate any help we get!
+We are still currently developing When Last to support multiple languages and need your help. Please feel free to translate When Last Login into your language, it will help us greatly.
 
 = Languages Supported =
 * French
@@ -46,13 +46,12 @@ Here is a list of plugins we currently support:
 = Upcoming Features =
 Please note that these features are not guaranteed to be released and may change at our discretion.
 
-* Automatic customizable emails to users that haven't logged into your site after X days/months
+* Automatic customizable emails to users that haven't logged into your site after X days/months - TBA
 * Keep track of login count per user - COMPLETED
 * Statistics of top logged in users - COMPLETED
-* Integration with other plugins - Works with Paid Memberships Pro
-* View readme for supported languages
-* When Last Filters
-* Show last login details for specific WordPress roles
+* Integration with other plugins - Works with Paid Memberships Pro, more plugins TBA
+* When Last Filters - UPDATED
+* Show last login details for specific WordPress roles - TBA
 
 == Installation ==
 1. Upload the plugin files to the '/wp-content/plugins' directory, or install the plugin through the WordPress plugins screen directly.
@@ -62,16 +61,30 @@ Please note that these features are not guaranteed to be released and may change
 
 == Frequently Asked Questions ==
 
+= What does When Last Login do exactly? =
+When Last Login allows you to see when last users have logged into your WordPress website. This is great for big sites that require user management. 
+
 = Is this plugin free? =
-Yes, When Last is free. We are looking into possibilities of creating a Pro version with a lot more features around the user data of WordPress users. We rely heavily on donations to keep all of our plugins free. If you wish to donate, please click on the donation link on the WordPress repository.
+Yes, When Last Login is a free plugin for WordPress. We are looking into possibilities of creating a Pro version with a lot more features around the user data of WordPress users. We rely heavily on donations to keep all of our plugins free. If you wish to donate, please click on the donation link on the WordPress repository.
 
 = I have activated my plugin and there is no "When Last" settings page? =
-We decided at this point in time (v0.1) that there is no need for a settings page as this plugin is lightweight and does not need configuration. 
+We decided that there is no need for a settings page as this plugin is lightweight and does not need configuration. 
 
 = I have installed When Last but users are showing "Never" under "Last Login"? =
 This is because users have not logged in since you have activated "When Last Login". By default we set the "Last Login" to "Never" but this can be easily changed. Once a user logs into your site, their profile will be updated from "Never" to a timestamp.
 
-If you need assistance, please open up a support thread.
+= I have updated and lost my 'Login Records' link in the WordPress dashboard =
+As of version 0.6 the 'Login Records' has been moved under the 'Users' link in the admin dashboard. 
+
+= How can I hide the 'All Login Records'? =
+Add the following snippet of code to your theme's functions.php or custom plugin -
+
+add_filter( 'when_last_login_show_records_table', '__return_false' );
+
+= How can I hide the 'Top 3 Users' widget? =
+Add the following snippet of code to your theme's functions.php or custom plugin -
+
+add_filter( 'when_last_login_show_admin_widget', '__return_false' );
 
 
 == Screenshots ==
@@ -81,11 +94,16 @@ If you need assistance, please open up a support thread.
 
 == Changelog ==
 
+= 0.6 =
+* Enhancement: Moved 'All Login Records' underneath 'Users' link in dashboard.
+* Filter: 'when_last_login_show_records_table'. Accepts boolean (default: true).
+* Filter: 'when_last_login_show_admin_widget'. Accepts boolean (default: true).
+
+Please have a look over at https://whenlastlogin.com#updates for more information.
+
 = 0.5 =
-* Enhancement: Ability to see which users have logged in and at what times ( Custom Post Type ) - @jarrydlong
-  
+* Enhancement: Ability to see which users have logged in and at what times ( Custom Post Type ) - @jarrydlong 
 * Bug Fix: return default value for column data if no data is found - @seagyn
-  
 * Enhancement: Improved code readability
 
 = 0.4 =
@@ -103,6 +121,8 @@ If you need assistance, please open up a support thread.
 * First Release
 
 == Upgrade Notice ==
+= 0.6 =
+* Please update When Last Login to receive new features. Love When Last Login? Buy the developer a cup of coffee! $5.
 
 = 0.5 =
 * Please update When Last Login to receive our latest feature. Please report any bugs you find on the support forum!
