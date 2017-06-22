@@ -1,9 +1,9 @@
 === When Last Login ===
-Contributors: andrewza
+Contributors: andrewza, yoohooplugins, travislima
 Tags: last login, user login, user login time, last logged in, last seen, user last seen, wordpress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
 Requires at least: 4.0
-Tested up to: 4.7
+Tested up to: 4.7.5
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -22,9 +22,13 @@ A lightweight plugin that allows you to see active users according to their last
 * See a more detailed log of user's logins with times under 'Latest Login Records'
 * Filter 'when_last_login_show_records_table'. Accepts boolean (Show/Hide Latest Login records).
 * Filter 'when_last_login_show_admin_widget'. Accepts boolean (Show/Hide admin widget for top logins).
+* Ability to record the user's IP address when logging in (Optional Setting)
 
+= Premium Add-ons =
+* [When Last Login - Slack Notifications](https://yoohooplugins.com/plugins/when-last-login-slack-notifications/?utm_source=plugin&utm_medium=wordpress&utm_campaign=slack_notifications)
+* [When Last Login - User Statistics](https://yoohooplugins.com/plugins/when-last-login-user-statistics/?utm_source=plugin&utm_medium=wordpress&utm_campaign=user_statistics)
 
-= When Last in your Language =
+= When Last Login in your Language =
 We are still currently developing When Last to support multiple languages and need your help. Please feel free to translate When Last Login into your language, it will help us greatly.
 
 = Languages Supported =
@@ -93,6 +97,13 @@ add_filter( 'when_last_login_show_admin_widget', '__return_false' );
 
 
 == Changelog ==
+
+= 0.7 =
+* New Feature: Settings page introduced
+* New Feature: Ability to record a user's IP address when logging in
+* Enhancement: Login Records moved under the 'When Last Login' menu item
+* New Hook Added: 'wll_settings_admin_menu_item'
+* New Hook Added: 'wll_logged_in_action'
 
 = 0.6 =
 * Enhancement: Moved 'All Login Records' underneath 'Users' link in dashboard.
