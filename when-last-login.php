@@ -3,12 +3,18 @@
 Plugin Name: When Last Login
 Plugin URI: https://wordpress.org/plugins/when-last-login/
 Description: Adds functionality to WordPress to show when a user last logged in.
-Version: 0.7
+Version: 0.8
 Author: YooHoo Plugins
 Author URI: https://yoohooplugins.com
 Text Domain: when-last-login
 Domain Path: /languages
   
+  * 0.8 07-06-2017
+  * Enhancement: If enabled, user's IP address is availableon the 'Users' profile page
+  * Enhancement: If enabled, user's IP address is recorded on registration
+  * Improvements to add-ons page
+  * Enhancement: User IP address is now visible for each login record if enabled
+  * 
   * 0.7 26-05-2017
   * New Feature: Settings page introduced
   * New Feature: Ability to record a user's IP address when logging in
@@ -58,7 +64,7 @@ class When_Last_Login {
 
       //Create the custom meta upon login
       add_action( 'wp_login', array( $this, 'last_login'), 10, 2 );
-
+      add_action( 'user_register', array( $this, 'wll_user_register' ), 10, 1 );
       //Admin actions
       add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );
       add_action( 'admin_notices', array( $this, 'update_notice' ) );
@@ -82,7 +88,11 @@ class When_Last_Login {
 
       add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
       add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
-      } // end constructor
+
+      add_filter( 'manage_wll_records_posts_columns' , array( $this, 'wll_records_columns'), 10, 1 );
+      add_action( 'manage_wll_records_posts_custom_column' , array( $this, 'wll_records_column_contents' ), 10, 2 );
+
+    } // end constructor
 
     /**
     * Creates or returns an instance of this class.
@@ -226,11 +236,34 @@ class When_Last_Login {
           }
 
           update_post_meta( $post_id, 'wll_user_ip_address', $ip );
+          update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
         }
         
       }
 
-      do_action( 'wll_logged_in_action', array( 'login_count' => $wll_new_value, 'user' => $users ) );
+      do_action( 'wll_logged_in_action', array( 'login_count' => $wll_new_value, 'user' => $users ), $wll_settings );
+
+     }
+
+     public function wll_user_register( $user_id ){
+
+        $wll_settings = get_option( 'wll_settings' );
+
+        if( isset( $wll_settings['record_ip_address'] ) && $wll_settings['record_ip_address'] == 1 ){
+          
+          if( !empty( $_SERVER['HTTP_CLIENT_IP'] ) ){
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+          } else if ( !empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ){
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+          } else {
+            $ip = $_SERVER['REMOTE_ADDR'];
+          }
+
+          update_user_meta( $user_id, 'wll_user_ip_address', $ip );
+
+        }
+
+        do_action( 'wll_register_action', $user_id, $wll_settings );
 
      }
 
@@ -340,6 +373,8 @@ class When_Last_Login {
      */
      public static function column_header( $column ){
        $column['when_last_login'] = __( 'Last Login', 'when-last-login' );
+       $column['when_last_login_ip_address'] = __( 'Last Logged In IP Address', 'when-last-login' );
+
        return $column;
      }
 
@@ -360,6 +395,17 @@ class When_Last_Login {
             }
 
           }
+        } else if( $column_name == 'when_last_login_ip_address' ){
+
+          $when_last_login_ip_address = get_user_meta( $id, 'wll_user_ip_address', true );
+
+          if ( $when_last_login_ip_address && $when_last_login_ip_address != "" ) {
+            return "<a href='http://www.ip-adress.com/ip_tracer/".$when_last_login_ip_address."' target='_BLANK' title='".__( 'Lookup', 'when-last-login' )."'>".$when_last_login_ip_address."</a>";
+          } else {
+            return __( 'IP Address Not Recorded', 'when-last-login' );
+          }
+
+
         }
       return $value;
      }
@@ -410,6 +456,7 @@ class When_Last_Login {
 
       add_menu_page( __('When Last Login', 'when-last-login'), __('When Last Login', 'when-last-login'), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
       add_submenu_page( 'when-last-login-settings', __('Settings', 'when-last-login'), __('Settings', 'when-last-login'), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+      add_submenu_page( 'when-last-login-settings', __('Extensions', 'when-last-login'), __('Extensions', 'when-last-login'), 'manage_options', 'admin.php?page=when-last-login-settings&tab=add-ons' );
       
       do_action( 'wll_settings_admin_menu_item' );
 
@@ -433,6 +480,28 @@ class When_Last_Login {
         $wll_settings = apply_filters( 'wll_settings_filter', $wll_settings );
 
         update_option( 'wll_settings', $wll_settings );
+
+      }
+
+    }
+
+    public function wll_records_columns( $columns ){
+
+      return array_merge( $columns, array( 'wll-ip-address' => __( 'IP Address', 'when-last-login' ) ) );
+
+    }
+
+    public function wll_records_column_contents( $column, $post_id ){
+
+      switch ( $column ) {
+        case 'wll-ip-address':
+          $ip_address = get_post_meta( $post_id, 'wll_user_ip_address', true );
+          if ( $ip_address && $ip_address != "" ) {
+            echo "<a href='http://www.ip-adress.com/ip_tracer/".$ip_address."' target='_BLANK' title='".__( 'Lookup', 'when-last-login' )."'>".$ip_address."</a>";
+          } else {
+            _e( 'IP Address Not Recorded', 'when-last-login' );
+          }
+          break;
 
       }
 

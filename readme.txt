@@ -3,7 +3,7 @@ Contributors: andrewza, yoohooplugins, travislima
 Tags: last login, user login, user login time, last logged in, last seen, user last seen, wordpress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
 Requires at least: 4.0
-Tested up to: 4.7.5
+Tested up to: 4.8
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -16,17 +16,22 @@ A lightweight plugin that allows you to see active users according to their last
 = Features =
 * Show when last a user has logged into your site
 * Sorts users according to last login time stamp (Ascending/Descending)
-* Lightweight, no settings page. Activate your plugin and you're done!
 * Administrator widget for top users according to login statistics
 * Integration with Paid Memberships Pro - Add's a 'Last Logged In' column to the 'Members List'
 * See a more detailed log of user's logins with times under 'Latest Login Records'
 * Filter 'when_last_login_show_records_table'. Accepts boolean (Show/Hide Latest Login records).
 * Filter 'when_last_login_show_admin_widget'. Accepts boolean (Show/Hide admin widget for top logins).
 * Ability to record the user's IP address when logging in (Optional Setting)
+* A variety of [Premium](https://yoohooplugins.com/plugins/?utm_source=plugin&utm_medium=wordpress&utm_campaign=premium_addons) and Free add-ons available. 
+
+= Free Add-ons =
+* [When Last Login - Welcome Email](https://wordpress.org/plugins/when-last-login-welcome-email-add-on/)
+* [When Last Login - Export User Records](https://wordpress.org/plugins/when-last-login-export-user-records/)
 
 = Premium Add-ons =
 * [When Last Login - Slack Notifications](https://yoohooplugins.com/plugins/when-last-login-slack-notifications/?utm_source=plugin&utm_medium=wordpress&utm_campaign=slack_notifications)
 * [When Last Login - User Statistics](https://yoohooplugins.com/plugins/when-last-login-user-statistics/?utm_source=plugin&utm_medium=wordpress&utm_campaign=user_statistics)
+* [When Last Login - Zapier Integration](https://yoohooplugins.com/plugins/zapier-integration/?utm_source=plugin&utm_medium=wordpress&utm_campaign=zapier_integration)
 
 = When Last Login in your Language =
 We are still currently developing When Last to support multiple languages and need your help. Please feel free to translate When Last Login into your language, it will help us greatly.
@@ -71,14 +76,15 @@ When Last Login allows you to see when last users have logged into your WordPres
 = Is this plugin free? =
 Yes, When Last Login is a free plugin for WordPress. We are looking into possibilities of creating a Pro version with a lot more features around the user data of WordPress users. We rely heavily on donations to keep all of our plugins free. If you wish to donate, please click on the donation link on the WordPress repository.
 
-= I have activated my plugin and there is no "When Last" settings page? =
-We decided that there is no need for a settings page as this plugin is lightweight and does not need configuration. 
+= Where is the When Last Login settings page? =
+This can be found by hovering over the 'When Last Login' menu item and clicking on 'Settings'.
 
 = I have installed When Last but users are showing "Never" under "Last Login"? =
 This is because users have not logged in since you have activated "When Last Login". By default we set the "Last Login" to "Never" but this can be easily changed. Once a user logs into your site, their profile will be updated from "Never" to a timestamp.
 
 = I have updated and lost my 'Login Records' link in the WordPress dashboard =
 As of version 0.6 the 'Login Records' has been moved under the 'Users' link in the admin dashboard. 
+Version 0.7 introduced a settings page menu item. The 'Login Records' can now be found under the 'When Last Login' menu item. 
 
 = How can I hide the 'All Login Records'? =
 Add the following snippet of code to your theme's functions.php or custom plugin -
@@ -97,6 +103,12 @@ add_filter( 'when_last_login_show_admin_widget', '__return_false' );
 
 
 == Changelog ==
+
+* 0.8 07-06-2017
+* Enhancement: If enabled, user's IP address is availableon the 'Users' profile page
+* Enhancement: If enabled, user's IP address is recorded on registration
+* Improvements to add-ons page
+* Enhancement: User IP address is now visible for each login record if enabled
 
 = 0.7 =
 * New Feature: Settings page introduced

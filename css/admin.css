@@ -33,3 +33,11 @@
 .wll_add_ons_button{
 	text-align: right;
 }
+
+@media( max-width: 500px){
+
+	.wll_add_ons_single_container{
+		width: 98%;
+	}
+
+}
