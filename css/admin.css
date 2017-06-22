@@ -1,0 +1,43 @@
+.wll_add_ons_single_container {
+    display: inline-block;
+    width: 19%;
+    background-color: #FFF;
+    margin: 5px;
+    box-shadow: 1px 1px 1px #CCC
+}
+
+.wll_add_ons_image{
+	width: 100%;
+	display: block;
+}
+
+.wll_add_ons_image img{
+	max-width: 100%;
+}
+
+.wll_add_ons_title, .wll_add_ons_description, .wll_add_ons_button{
+	padding: 15px;	
+}
+
+.wll_add_ons_description{
+	padding: 0 15px;
+	min-height: 65px;
+}
+
+.wll_add_ons_title{
+	font-weight: bold;
+	text-align: center;
+	display: block;
+}
+
+.wll_add_ons_button{
+	text-align: right;
+}
+
+@media( max-width: 500px){
+
+	.wll_add_ons_single_container{
+		width: 98%;
+	}
+
+}
