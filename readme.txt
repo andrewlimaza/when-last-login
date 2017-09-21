@@ -1,27 +1,27 @@
 === When Last Login ===
 Contributors: andrewza, yoohooplugins, travislima
-Tags: last login, user login, user login time, last logged in, last seen, user last seen, wordpress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen
+Tags: last login, user login, user login time, last logged in, last seen, user last seen, WordPress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen, last login WordPress
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
 Requires at least: 4.0
 Tested up to: 4.8
+Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Show a users last login by creating a sort-able column in your users list.
+Show a users last login date by creating a sortable column in your WordPress users list.
 
 == Description ==
-A lightweight plugin that allows you to see active users according to their last login time. No need to configure, simply activate When Last and you're ready to go! Adds a custom column to your Users list of "Last Login" and a timestamp linked to that user. When Last also integrates with other plugins.
+A lightweight plugin that allows you to see active users according to their last login time/date. No need to configure, simply activate When Last and you're ready to go! This adds a custom column to your WordPress users list of "Last Login" and a timestamp linked to that user. When Last also integrates with other plugins and now offers some more features.
 
 = Features =
-* Show when last a user has logged into your site
-* Sorts users according to last login time stamp (Ascending/Descending)
-* Administrator widget for top users according to login statistics
-* Integration with Paid Memberships Pro - Add's a 'Last Logged In' column to the 'Members List'
-* See a more detailed log of user's logins with times under 'Latest Login Records'
-* Filter 'when_last_login_show_records_table'. Accepts boolean (Show/Hide Latest Login records).
-* Filter 'when_last_login_show_admin_widget'. Accepts boolean (Show/Hide admin widget for top logins).
-* Ability to record the user's IP address when logging in (Optional Setting)
+* Show when last a user has logged into your site.
+* Sorts users according to last login time stamp (Ascending/Descending) in the WordPress user list.
+* Administrator widget for top 3 users according to login statistics.
+* Integrates with Paid Memberships Pro  1.8+ - Add's a 'Last Logged In' column to the 'Members List'.
+* Generates a login history table under 'When Last Login' > 'All Login Records'. 
+* Hooks and filters for developers.
+* Record the user's last IP address when logging into your WordPress website (Optional Setting).
 * A variety of [Premium](https://yoohooplugins.com/plugins/?utm_source=plugin&utm_medium=wordpress&utm_campaign=premium_addons) and Free add-ons available. 
 
 = Free Add-ons =
@@ -34,33 +34,38 @@ A lightweight plugin that allows you to see active users according to their last
 * [When Last Login - Zapier Integration](https://yoohooplugins.com/plugins/zapier-integration/?utm_source=plugin&utm_medium=wordpress&utm_campaign=zapier_integration)
 
 = When Last Login in your Language =
-We are still currently developing When Last to support multiple languages and need your help. Please feel free to translate When Last Login into your language, it will help us greatly.
-
-= Languages Supported =
-* French
-* Italian
-* German
-* Spanish
+We need your help to translate When Last Login into your locale. To translate When Last Login, simply visit [https://translate.wordpress.org/projects/wp-plugins/when-last-login](https://translate.wordpress.org/projects/wp-plugins/when-last-login)
 
 = Track Your Members Better =
 You are able to track which members login to your site by simply sorting your default user's list according to when last the user was seen in easily readable text such as "X Min/Hours/Days/Weeks/Months/Years".
-
-Newly added - administrator dashboard widget for top users according to their login count. 
 
 = Plugins that When Last Login integrates with =
 Here is a list of plugins we currently support:
 
 * Paid Memberships Pro
 
+If you have a plugin and would like to integrate with When Last Login, please open a support thread.
+
 = Upcoming Features =
 Please note that these features are not guaranteed to be released and may change at our discretion.
 
-* Automatic customizable emails to users that haven't logged into your site after X days/months - TBA
+* Automatic customizable emails to users that haven't logged into your site after X days/months.
+* Integration with other plugins - Works with Paid Memberships Pro, more plugins to be announced.
+* Show last login details for specific WordPress roles.
+* Disable certain users from logging in.
+
 * Keep track of login count per user - COMPLETED
 * Statistics of top logged in users - COMPLETED
-* Integration with other plugins - Works with Paid Memberships Pro, more plugins TBA
-* When Last Filters - UPDATED
-* Show last login details for specific WordPress roles - TBA
+* When Last Filters - COMPLETED
+
+= Need Help =
+We currently offer three channels for support:
+
+1. [The WordPress.org repository](https://wordpress.org/support/plugin/when-last-login)
+2. [YooHoo Plugins support forums](https://yoohooplugins.com/support/)
+3. [YooHoo Plugins email support](https://yoohooplugins.com/forums/forum/support-forum/)
+
+We will try our best to assist you to the best of our ability.
 
 == Installation ==
 1. Upload the plugin files to the '/wp-content/plugins' directory, or install the plugin through the WordPress plugins screen directly.
@@ -101,8 +106,12 @@ add_filter( 'when_last_login_show_admin_widget', '__return_false' );
 1. When Last Login - User's list custom last login field with sorting according to "Last Login" time.
 2. When Last Login - Show top 3 user login (includes 'administrators' in free version)
 
-
 == Changelog ==
+
+= 0.9 22-08-2017 =
+* Enhancement: Multisite Support - Dashboard widget
+* Enhancement: Multisite Support - User activity is now visible in the network admin's 'Users' page
+* Bug Fix: Fixed an undefined variable when logging in
 
 * 0.8 07-06-2017
 * Enhancement: If enabled, user's IP address is availableon the 'Users' profile page
