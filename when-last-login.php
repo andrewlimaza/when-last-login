@@ -29,6 +29,7 @@ class When_Last_Login {
         //Create the custom meta upon login
         add_action( 'wp_login', array( $this, 'last_login'), 10, 2 );
         add_action( 'user_register', array( $this, 'wll_user_register' ), 10, 1 );
+
         //Admin actions
         add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );      
         add_action( 'admin_notices', array( $this, 'update_notice' ) );
@@ -52,6 +53,13 @@ class When_Last_Login {
 
         add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
         add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
+        add_filter( 'plugin_row_meta', array( $this, 'wll_plugin_row_meta' ), 10, 2 );
+
+
+        add_filter( 'plugin_action_links_' . WHEN_LAST_LOGIN_BNAME, array( $this, 'wll_plugin_row_meta' ), 10, 2 );
+
+
+        //add plugin row_meta here
 
         add_filter( 'manage_wll_records_posts_columns' , array( $this, 'wll_records_columns'), 10, 1 );
         add_action( 'manage_wll_records_posts_custom_column' , array( $this, 'wll_records_column_contents' ), 10, 2 );
@@ -248,7 +256,17 @@ class When_Last_Login {
 
       global $show_login_records;
 
-      $show_login_records = apply_filters( 'when_last_login_show_records_table', true );
+      $settings = get_option( 'wll_settings' );
+
+      $show = $settings['show_all_login_records'];
+
+      if( 1 === $show ) {
+        $show = true;
+      }else{
+        $show = false;
+      }
+
+      $show_login_records = apply_filters( 'when_last_login_show_records_table', $show );
 
       if( $show_login_records != true ){
         return;
@@ -585,7 +603,18 @@ class When_Last_Login {
           break;
 
       }
+    }
 
+    public function wll_plugin_row_meta( $links, $file ) {
+      if ( strpos( $file, 'when-last-login.php' ) !== false ) {
+        $new_links = array(
+          '<a href="' . admin_url('admin.php?page=when-last-login-settings') . '" title="' . esc_attr( __( 'View Settings', 'when-last-login' ) ) . '">' . __( 'Settings', 'when-last-login' ) . '</a>',
+          '<a href="' . esc_url( 'https://yoohooplugins.com/?s=when+last+login' ) . '" title="' . esc_attr( __( 'View Documentation', 'when-last-login' ) ) . '">' . __( 'Docs', 'when-last-login' ) . '</a>',
+          '<a href="' . esc_url( 'https://yoohooplugins.com/support/' ) . '" title="' . esc_attr( __( 'Visit Customer Support Forum', 'when-last-login' ) ) . '">' . __( 'Support', 'when-last-login' ) . '</a>',
+        );
+        $links = array_merge( $links, $new_links );
+      }
+      return $links;
     }
 
 } // end class

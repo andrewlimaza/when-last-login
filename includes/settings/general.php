@@ -9,7 +9,7 @@
 
 <?php if( isset( $settings['show_all_login_records'] ) && $settings['show_all_login_records'] == 1 ){ $checked = 1; } else { $checked = 0; } ?>
 <tr>
-	<th><?php _e('Enable record log', 'when-last-login'); ?></th>
+	<th><?php _e('Enable "All Login Records" log', 'when-last-login'); ?></th>
 	<td><input type='checkbox' value='1' name='wll_all_login_records' <?php checked( 1, $checked ); ?>/></td>
 </tr>
 
