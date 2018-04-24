@@ -2,9 +2,9 @@
 /*
 Plugin Name: When Last Login
 Plugin URI: https://wordpress.org/plugins/when-last-login/
-Description: Adds functionality to WordPress to show when a user last logged in.
+Description: See when a user logs into your WordPress site.
 Version: 0.9
-Author: YooHoo Plugins
+Author: Yoohoo Plugins
 Author URI: https://yoohooplugins.com
 Text Domain: when-last-login
 Domain Path: /languages
@@ -153,7 +153,7 @@ class When_Last_Login {
 
         } else {
 
-          _e('Please enter in an email address to subscribe to our mailing list and receive your 20% coupon', 'when-last-login');
+          _e( 'Please enter in an email address to subscribe to our mailing list and receive your coupon', 'when-last-login' );
 
         }
 
@@ -535,13 +535,26 @@ class When_Last_Login {
 
         $wll_settings['user_access'] = isset( $_POST['wll_login_record_user_access'] ) ? $_POST['wll_login_record_user_access'] : "";
         $wll_settings['record_ip_address'] = isset( $_POST['wll_record_user_ip_address'] ) && $_POST['wll_record_user_ip_address'] == '1'  ? 1 : 0;
+        $wll_settings['show_all_login_records'] = isset( $_POST['wll_all_login_records'] ) && $_POST['wll_all_login_records'] == '1'  ? 1 : 0;
+
 
         $wll_settings = apply_filters( 'wll_settings_filter', $wll_settings );
 
-        update_option( 'wll_settings', $wll_settings );
+        if ( update_option( 'wll_settings', $wll_settings ) ) {
+          //show admin notice here.
+          add_action( 'admin_notices', array( $this, 'wll_admin_notices' ) );
+        }
 
       }
 
+    }
+
+    public function wll_admin_notices() {
+    ?>
+      <div class="notice notice-success is-dismissible">
+        <p><?php _e( 'Settings saved successfully.', 'when-last-login' ); ?></p>
+      </div>
+    <?php
     }
 
     public function wll_records_columns( $columns ){
