@@ -8,48 +8,6 @@ Author: YooHoo Plugins
 Author URI: https://yoohooplugins.com
 Text Domain: when-last-login
 Domain Path: /languages
-  
-  * 0.9
-  * Enhancement: Multisite Support - Dashboard widget
-  * Enhancement: Multisite Support - User activity is now visible in the network admin's 'Users' page
-  * Bug Fix: Fixed an undefined variable when logging in
-  * 
-  * 0.8 07-06-2017
-  * Enhancement: If enabled, user's IP address is available on the 'Users' profile page
-  * Enhancement: If enabled, user's IP address is recorded on registration
-  * Improvements to add-ons page
-  * Enhancement: User IP address is now visible for each login record if enabled
-  * 
-  * 0.7 26-05-2017
-  * New Feature: Settings page introduced
-  * New Feature: Ability to record a user's IP address when logging in
-  * Enhancement: Login Records moved under the 'When Last Login' menu item
-  * New Hook Added: 'wll_settings_admin_menu_item'
-  * New Hook Added: 'wll_logged_in_action'
-  * 
-  * 0.6 26-04-2017
-  * Filter: 'when_last_login_show_records_table'. Accepts bool (default = true)
-  * Filter: 'when_last_login_show_admin_widget'. Accepts bool (default = true)
-  * Enhancement: Moved 'Login Records' under 'Users' link.
-  *
-  * 0.5 29-09-2016
-  * Enhancement: Ability to see which users have logged in and at what times - Custom Post Type - @jarrydlong
-  * Bug Fix: return default value for column data if no data is found - @seagyn
-  * Enhancement: Improved code readability
-  *
-  * 0.4 29-08-2016
-  * Enhancement: Implemented widgetto display top logged in users
-  *
-  * 0.3 22-07-2016
-  * Enhancement: Implemented multi language support and a couple of language files.
-  * Language Support: French, Spanish, German and Italian
-  *
-  * 0.2 - 15-07-2016
-  * Bug Fixes: fixed missing 'static' on function 'sort_by_login_date'
-  * Error Handling: Check if 'Paid Memberships Pro' is installed, if not return from the function
-  *
-  * 0.1 - 15-07-2016
-  * Initial release
 */
 
 class When_Last_Login {
@@ -131,46 +89,7 @@ class When_Last_Login {
         delete_transient( 'when_last_login_add_ons_page' );
         update_option( 'wll_current_version', 0.9 );
       }
-
     }
-
-    public function wll_login_attempts_activation(){
-
-        $settings = get_option( 'WLLLimitLoginAttempts' );
-
-        if( !$settings || $settings == "" ){
-
-          $settings_array = array(
-            'enabled' => 1,
-            'attempts' => 3,
-            'wait' => 60
-          );
-
-          update_option( 'WLLLimitLoginAttempts', $settings_array );
-
-          global $wpdb;
-
-          $table_name = $wpdb->prefix . 'wll_login_attempts';
-
-          $wpdb_collate = $wpdb->collate;
-
-          $sql =
-          "CREATE TABLE {$table_name} (
-            id int(11) unsigned NOT NULL auto_increment,
-            username varchar(255) NULL, 
-            ip_address varchar(255) NULL, 
-            time_slot varchar(255) NULL,
-            PRIMARY KEY  (id) 
-          ) 
-          COLLATE {$wpdb_collate}";
-
-          require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-          dbDelta( $sql );
-
-        }
-
-      }
-
 
     public static function text_domain(){
       load_plugin_textdomain( 'when-last-login', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
@@ -649,5 +568,3 @@ class When_Last_Login {
 
 } // end class
 When_Last_Login::get_instance();
-
-// include plugin_dir_path( __FILE__ ).'/includes/when_last_login_limit_logins.class.php';

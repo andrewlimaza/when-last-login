@@ -3,7 +3,7 @@ Contributors: andrewza, yoohooplugins, travislima
 Tags: last login, user login, user login time, last logged in, last seen, user last seen, WordPress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen, last login WordPress
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
 Requires at least: 4.0
-Tested up to: 4.8
+Tested up to: 4.9
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv2 or later
@@ -47,7 +47,7 @@ Here is a list of plugins we currently support:
 If you have a plugin and would like to integrate with When Last Login, please open a support thread.
 
 = Upcoming Features =
-Please note that these features are not guaranteed to be released and may change at our discretion.
+Please note that these features are not guaranteed to be released and may change at our discretion. Some of these features may be added in as an additional add-on.
 
 * Automatic customizable emails to users that haven't logged into your site after X days/months.
 * Integration with other plugins - Works with Paid Memberships Pro, more plugins to be announced.
@@ -59,13 +59,10 @@ Please note that these features are not guaranteed to be released and may change
 * When Last Filters - COMPLETED
 
 = Need Help =
-We currently offer three channels for support:
+We currently offer the following support channels:
 
 1. [The WordPress.org repository](https://wordpress.org/support/plugin/when-last-login)
-2. [YooHoo Plugins support forums](https://yoohooplugins.com/support/)
-3. [YooHoo Plugins email support](https://yoohooplugins.com/forums/forum/support-forum/)
-
-We will try our best to assist you to the best of our ability.
+2. [Email Support](https://yoohooplugins.com/support/)
 
 == Installation ==
 1. Upload the plugin files to the '/wp-content/plugins' directory, or install the plugin through the WordPress plugins screen directly.
