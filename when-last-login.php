@@ -3,14 +3,19 @@
 Plugin Name: When Last Login
 Plugin URI: https://wordpress.org/plugins/when-last-login/
 Description: Adds functionality to WordPress to show when a user last logged in.
-Version: 0.8
+Version: 0.9
 Author: YooHoo Plugins
 Author URI: https://yoohooplugins.com
 Text Domain: when-last-login
 Domain Path: /languages
   
+  * 0.9
+  * Enhancement: Multisite Support - Dashboard widget
+  * Enhancement: Multisite Support - User activity is now visible in the network admin's 'Users' page
+  * Bug Fix: Fixed an undefined variable when logging in
+  * 
   * 0.8 07-06-2017
-  * Enhancement: If enabled, user's IP address is availableon the 'Users' profile page
+  * Enhancement: If enabled, user's IP address is available on the 'Users' profile page
   * Enhancement: If enabled, user's IP address is recorded on registration
   * Improvements to add-ons page
   * Enhancement: User IP address is now visible for each login record if enabled
@@ -55,44 +60,54 @@ class When_Last_Login {
     /**
     * Initializes the plugin by setting localization, filters, and administration functions.
     */
-    private function __construct() {
-      define( 'WHEN_LAST_LOGIN_BNAME', plugin_basename( __FILE__ ) );
+    private function __construct() {        
 
-      add_action( 'init', array( $this, 'init' ) );
-      add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
-      add_action( 'admin_enqueue_scripts', array( $this, 'load_js_for_notice' ) );
+        define( 'WHEN_LAST_LOGIN_BNAME', plugin_basename( __FILE__ ) );
 
-      //Create the custom meta upon login
-      add_action( 'wp_login', array( $this, 'last_login'), 10, 2 );
-      add_action( 'user_register', array( $this, 'wll_user_register' ), 10, 1 );
-      //Admin actions
-      add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );
-      add_action( 'admin_notices', array( $this, 'update_notice' ) );
-      
-      add_action( 'wp_ajax_save_update_notice', array( $this, 'save_update_notice' ) );
-      add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_save_subscription_notice' ) );
-      add_action( 'wp_ajax_wll_subscribe_user_newsletter', array( $this, 'wll_subscribe_user_newsletter_callback' ) );
-      
+        add_action( 'init', array( $this, 'init' ) );
+        add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'load_js_for_notice' ) );
 
-      //Setting up columns.
-      add_filter( 'manage_users_columns', array( $this, 'column_header'), 10, 1 );
-      add_action( 'manage_users_custom_column', array( $this, 'column_data'), 15, 3 );
-      add_filter( 'manage_users_sortable_columns', array( $this, 'column_sortable' ) );
-      add_action( 'pre_get_users', array( $this, 'sort_by_login_date') );
+        //Create the custom meta upon login
+        add_action( 'wp_login', array( $this, 'last_login'), 10, 2 );
+        add_action( 'user_register', array( $this, 'wll_user_register' ), 10, 1 );
+        //Admin actions
+        add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );      
+        add_action( 'admin_notices', array( $this, 'update_notice' ) );
 
-      //Integration for Paid Memberships Pro
-      //TODO: Improve integration with Member List and Paid Memberships Pro
-      add_action( 'pmpro_memberslist_extra_cols_header', array( $this, 'pmpro_memberlist_add_header' ) );
-      add_action( 'pmpro_memberslist_extra_cols_body', array( $this, 'pmpro_memberlist_add_column_data' ) );
-      add_action( 'init', array( $this, 'login_record_cp' ) );
+        add_action( 'wp_ajax_save_update_notice', array( $this, 'save_update_notice' ) );
+        add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_save_subscription_notice' ) );
+        add_action( 'wp_ajax_wll_subscribe_user_newsletter', array( $this, 'wll_subscribe_user_newsletter_callback' ) );
 
-      add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
-      add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
 
-      add_filter( 'manage_wll_records_posts_columns' , array( $this, 'wll_records_columns'), 10, 1 );
-      add_action( 'manage_wll_records_posts_custom_column' , array( $this, 'wll_records_column_contents' ), 10, 2 );
+        //Setting up columns.
+        add_filter( 'manage_users_columns', array( $this, 'column_header'), 10, 1 );
+        add_action( 'manage_users_custom_column', array( $this, 'column_data'), 15, 3 );
+        add_filter( 'manage_users_sortable_columns', array( $this, 'column_sortable' ) );
+        add_action( 'pre_get_users', array( $this, 'sort_by_login_date') );
 
-    } // end constructor
+        //Integration for Paid Memberships Pro
+        //TODO: Improve integration with Member List and Paid Memberships Pro
+        add_action( 'pmpro_memberslist_extra_cols_header', array( $this, 'pmpro_memberlist_add_header' ) );
+        add_action( 'pmpro_memberslist_extra_cols_body', array( $this, 'pmpro_memberlist_add_column_data' ) );
+        add_action( 'init', array( $this, 'login_record_cp' ) );
+
+        add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
+        add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
+
+        add_filter( 'manage_wll_records_posts_columns' , array( $this, 'wll_records_columns'), 10, 1 );
+        add_action( 'manage_wll_records_posts_custom_column' , array( $this, 'wll_records_column_contents' ), 10, 2 );
+
+        /**
+         * Multisite support
+         */
+        add_action( 'wp_network_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );
+        add_filter( 'wpmu_users_columns', array( $this, 'column_header'), 10, 1 );
+        add_action( 'wpmu_users_custom_column', array( $this, 'column_data'), 15, 3 );
+
+        register_activation_hook( __FILE__, array( $this, 'wll_login_attempts_activation' ) );
+
+    }
 
     /**
     * Creates or returns an instance of this class.
@@ -111,7 +126,50 @@ class When_Last_Login {
     */
     public static function init(){
     //init function
+    
+      if( floatval( get_option( 'wll_current_version' ) ) !== 0.9 ){
+        delete_transient( 'when_last_login_add_ons_page' );
+        update_option( 'wll_current_version', 0.9 );
+      }
+
     }
+
+    public function wll_login_attempts_activation(){
+
+        $settings = get_option( 'WLLLimitLoginAttempts' );
+
+        if( !$settings || $settings == "" ){
+
+          $settings_array = array(
+            'enabled' => 1,
+            'attempts' => 3,
+            'wait' => 60
+          );
+
+          update_option( 'WLLLimitLoginAttempts', $settings_array );
+
+          global $wpdb;
+
+          $table_name = $wpdb->prefix . 'wll_login_attempts';
+
+          $wpdb_collate = $wpdb->collate;
+
+          $sql =
+          "CREATE TABLE {$table_name} (
+            id int(11) unsigned NOT NULL auto_increment,
+            username varchar(255) NULL, 
+            ip_address varchar(255) NULL, 
+            time_slot varchar(255) NULL,
+            PRIMARY KEY  (id) 
+          ) 
+          COLLATE {$wpdb_collate}";
+
+          require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+          dbDelta( $sql );
+
+        }
+
+      }
 
 
     public static function text_domain(){
@@ -238,10 +296,10 @@ class When_Last_Login {
           update_post_meta( $post_id, 'wll_user_ip_address', $ip );
           update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
         }
-        
-      }
 
-      do_action( 'wll_logged_in_action', array( 'login_count' => $wll_new_value, 'user' => $users ), $wll_settings );
+        do_action( 'wll_logged_in_action', array( 'login_count' => $wll_new_value, 'user' => $users ), $wll_settings );
+
+      }
 
      }
 
@@ -331,42 +389,124 @@ class When_Last_Login {
        }
      }
 
-     public static function admin_dashboard_widget_display(){
+    public static function admin_dashboard_widget_display(){
 
-      global $show_widget, $show_login_records;
+        global $show_widget, $show_login_records;
 
-      if( $show_widget != true ){
-        return;
-      }
-
-      $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'ASC', 'oderby' => 'meta_value', 'number' => 3 ) );
-
-      $topusers = $user_query->get_results();
-
-       if( $topusers ){
-?>
-         <table width="100%" text-align="center">
-           <tr>
-             <td><b><span style="font-size:18px;"><?php _e( 'Users', 'when-last-login' ); ?></span></b></td>
-             <td><b><span style="font-size:18px;"><?php _e( 'Login Count', 'when-last-login' ); ?></span><b></td>
-           </tr>
-<?php
-         foreach($topusers as $wllusers){
-            echo '<tr><td>' . $wllusers->display_name . '</td>';
-            echo '<td>' . get_user_meta( $wllusers->ID, 'when_last_login_count', true ) . '</td></tr>';
+        if( $show_widget != true ){
+            return;
         }
-?>
-      </table>
-      <br/>
-      <a href="<?php echo admin_url( 'users.php?orderby=when_last_login&order=desc' ); ?>"><?php _e( 'View All Users', 'when-last-login' ); ?></a>
 
-      <?php if( $show_login_records == true ){ ?>
-      <a style="float:right" href="<?php echo admin_url( 'edit.php?post_type=wll_records' ); ?>"><?php _e( 'View Login Records', 'when-last-login' ); } //end the if filter check here ?></a>
-<?php
-      }else{
-       echo 'No data yet';
-     }
-}
+        if( is_network_admin() ){
+
+            $sites = get_sites();
+                        
+            if( is_array( $sites ) ){
+            
+                foreach( $sites as $site ){
+                
+                    $blog_id = $site->blog_id;
+                    $blog_details = get_blog_details( $blog_id );
+                
+                    ?><table width="100%" text-align="center" class='wp-list-table striped widefat'>          
+                    <tr>
+                        <th colspan='4' style='text-align: center;'><strong><?php echo $blog_details->blogname .' (<a href="'.$blog_details->siteurl.'" target="_BLANK">'.$blog_details->siteurl.')</a>'; ?></strong></th>
+                    </tr>                      
+                    <?php
+
+                    $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'ASC', 'oderby' => 'meta_value', 'number' => 3, 'blog_id' => $blog_id ) );
+
+                    $topusers = $user_query->get_results();
+
+                    if( $topusers ){
+                        ?>
+                        <tr>
+                            <th><strong>#</strong></th>
+                            <th><strong><?php _e( 'Users', 'when-last-login' ); ?></strong></th>
+                            <th><strong><?php _e( 'Login Count', 'when-last-login' ); ?></strong></th>
+                            <th><strong><?php _e( 'Last Logged In', 'when-last-login' ); ?></strong></th>
+                        </tr> 
+                    <?php
+                        
+                        $count = 1;
+                        
+                        foreach($topusers as $wllusers){
+                            echo '<tr><td>' . $count . '</td>';
+                            echo '<td>' . $wllusers->display_name . '</td>';
+                            echo '<td>' . get_user_meta( $wllusers->ID, 'when_last_login_count', true ) . '</td>';
+                            echo '<td>' . date( 'Y-m-d H:i:s', get_user_meta( $wllusers->ID, 'when_last_login', true ) ) . '</td></tr>';
+                            $count++;
+                        }
+                      
+                    } else {
+
+                        echo '<tr><td colspan="4">'.__('No data yet', 'when-last-login').'</td></tr>';
+            
+                    }
+
+                    ?></table><br/><?php
+
+                }
+             
+                ?>
+
+                <a href="<?php echo admin_url( 'users.php?orderby=when_last_login&order=desc' ); ?>"><?php _e( 'View All Users', 'when-last-login' ); ?></a>
+
+                <?php if( $show_login_records == true ){ ?>
+                    <a style="float:right" href="<?php echo admin_url( 'edit.php?post_type=wll_records' ); ?>"><?php _e( 'View Login Records', 'when-last-login' ); } //end the if filter check here ?></a>
+                <?php                
+                    
+            }
+        
+        } else {
+
+            ?><table width="100%" text-align="center" class='wp-list-table striped widefat'>          
+
+            <?php
+
+            $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'ASC', 'oderby' => 'meta_value', 'number' => 3 ) );
+
+            $topusers = $user_query->get_results();
+
+            if( $topusers ){
+                ?>
+                <tr>
+                    <th><strong>#</strong></th>
+                    <th><strong><?php _e( 'Users', 'when-last-login' ); ?></strong></th>
+                    <th><strong><?php _e( 'Login Count', 'when-last-login' ); ?></strong></th>
+                    <th><strong><?php _e( 'Last Logged In', 'when-last-login' ); ?></strong></th>
+                </tr> 
+            <?php
+                
+                $count = 1;
+                
+                foreach($topusers as $wllusers){
+                    echo '<tr><td>' . $count . '</td>';
+                    echo '<td>' . $wllusers->display_name . '</td>';
+                    echo '<td>' . get_user_meta( $wllusers->ID, 'when_last_login_count', true ) . '</td>';
+                    echo '<td>' . date( 'Y-m-d H:i:s', get_user_meta( $wllusers->ID, 'when_last_login', true ) ) . '</td></tr>';
+                    $count++;
+                }
+              
+            } else {
+
+                echo '<tr><td colspan="4">'.__('No data yet', 'when-last-login').'</td></tr>';
+    
+            }
+
+            ?></table><br/><?php
+
+        ?>
+
+        <a href="<?php echo admin_url( 'users.php?orderby=when_last_login&order=desc' ); ?>"><?php _e( 'View All Users', 'when-last-login' ); ?></a>
+
+        <?php if( $show_login_records == true ){ ?>
+            <a style="float:right" href="<?php echo admin_url( 'edit.php?post_type=wll_records' ); ?>"><?php _e( 'View Login Records', 'when-last-login' ); } //end the if filter check here ?></a>
+        <?php    
+
+        }
+
+    }
 
      /**
      * Setup Column and data for users page with sortable
@@ -509,3 +649,5 @@ class When_Last_Login {
 
 } // end class
 When_Last_Login::get_instance();
+
+// include plugin_dir_path( __FILE__ ).'/includes/when_last_login_limit_logins.class.php';
