@@ -431,14 +431,23 @@ class When_Last_Login {
      * Setup Column and data for users page with sortable
      */
      public static function column_header( $column ){
-       $column['when_last_login'] = __( 'Last Login', 'when-last-login' );
-       $column['when_last_login_ip_address'] = __( 'Last Logged In IP Address', 'when-last-login' );
+      $settings = get_option( 'wll_settings' );
+
+      $column['when_last_login'] = __( 'Last Login', 'when-last-login' );
+
+      if ( ! empty( $settings['record_ip_address'] ) ) {
+        $column['when_last_login_ip_address'] = __( 'Last Logged In IP Address', 'when-last-login' );
+      }
+      
 
        return $column;
      }
 
      public static function column_data( $value, $column_name, $id ){
-      if ($column_name == 'when_last_login'){
+
+      $settings = get_option( 'wll_settings' );
+
+      if ( $column_name == 'when_last_login' ){
 
         $when_last_login_meta = get_the_author_meta( 'when_last_login', $id );
 
@@ -458,7 +467,7 @@ class When_Last_Login {
 
           $when_last_login_ip_address = get_user_meta( $id, 'wll_user_ip_address', true );
 
-          if ( $when_last_login_ip_address && $when_last_login_ip_address != "" ) {
+          if ( $when_last_login_ip_address && $when_last_login_ip_address != "" && $settings['record_ip_address'] != "") {
             return "<a href='http://www.ip-adress.com/ip_tracer/".$when_last_login_ip_address."' target='_BLANK' title='".__( 'Lookup', 'when-last-login' )."'>".$when_last_login_ip_address."</a>";
           } else {
             return __( 'IP Address Not Recorded', 'when-last-login' );
