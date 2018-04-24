@@ -21,10 +21,9 @@ $sql = "DELETE FROM $wpdb->posts WHERE post_type='wll_records'";
 $wpdb->query( $sql );
 
 //Delete custom table if it exists
-$delete_table = $wpdb->prefix . 'users_copy';
-$drop_if_exists = "DROP TABLE IF EXISTS $delete_table";
-$wpdb->query( $drop_if_exists );
+$delete_table = $wpdb->prefix . 'wll_login_attempts' ;
+$sql = "DROP TABLE `$delete_table`";
+$wpdb->query( $sql );
 
-//clear up all options from 'options' table.
 $sqlQuery = "DELETE FROM $wpdb->options WHERE option_name LIKE 'wll%'";
 $wpdb->query($sqlQuery);
