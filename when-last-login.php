@@ -103,7 +103,7 @@ class When_Last_Login {
     }
 
     public static function text_domain(){
-      load_plugin_textdomain( 'when-last-login', false, dirname( WLL_BASE_NAME ) . '/languages' );
+      load_plugin_textdomain( 'when-last-login', false, dirname( 'WLL_BASE_NAME' ) . '/languages' );
     }
 
     public static function update_notice(){
