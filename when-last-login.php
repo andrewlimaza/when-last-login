@@ -56,7 +56,7 @@ class When_Last_Login {
         add_filter( 'plugin_row_meta', array( $this, 'wll_plugin_row_meta' ), 10, 2 );
 
 
-        add_filter( 'plugin_action_links_' . WHEN_LAST_LOGIN_BNAME, array( $this, 'wll_plugin_row_meta' ), 10, 2 );
+        add_filter( 'plugin_action_links_' . WHEN_LAST_LOGIN_BNAME, array( $this, 'wll_plugin_action_links' ), 10, 2 );
 
 
         //add plugin row_meta here
@@ -605,6 +605,16 @@ class When_Last_Login {
       }
     }
 
+    public function wll_plugin_action_links( $links ) {
+      $new_links = array(
+        '<a href="' . admin_url('admin.php?page=when-last-login-settings') . '" title="' . esc_attr( __( 'View Settings', 'when-last-login' ) ) . '">' . __( 'Settings', 'when-last-login' ) . '</a>'
+      );
+
+      $new_links = apply_filters( 'wll_plugin_action_links', $new_links );
+
+      return array_merge( $new_links, $links );
+    }
+
     public function wll_plugin_row_meta( $links, $file ) {
       if ( strpos( $file, 'when-last-login.php' ) !== false ) {
         $new_links = array(
@@ -612,6 +622,8 @@ class When_Last_Login {
           '<a href="' . esc_url( 'https://yoohooplugins.com/?s=when+last+login' ) . '" title="' . esc_attr( __( 'View Documentation', 'when-last-login' ) ) . '">' . __( 'Docs', 'when-last-login' ) . '</a>',
           '<a href="' . esc_url( 'https://yoohooplugins.com/support/' ) . '" title="' . esc_attr( __( 'Visit Customer Support Forum', 'when-last-login' ) ) . '">' . __( 'Support', 'when-last-login' ) . '</a>',
         );
+
+        $new_links = apply_filters( 'wll_plugin_row_meta', $new_links );
         $links = array_merge( $links, $new_links );
       }
       return $links;
