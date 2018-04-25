@@ -51,7 +51,7 @@ class When_Last_Login_GDPR{
 					<th><?php _e( 'Login tracking', 'when-last-login' ); ?></th>
 					<td>
 						<input type="checkbox" name="wll_consent_to_track" <?php echo checked( 1,$consent ); ?> > <?php echo $settings['registration_consent_text' ]; ?>
-						<small>(<?php _e( 'Date of consent', 'when-last-login' ); ?> - <?php echo $consent_date; ?>)</small>
+						<small>(<?php _e( 'Date of consent', 'when-last-login' ); ?> - <?php if ( ! empty( $consent_date ) ) { echo $consent_date; }else{ _e( 'N/A', 'when-last-login' ); } ?>)</small>
 					</td>
 				</tr>
 
