@@ -15,7 +15,7 @@
 
 <?php if( isset( $settings['gdpr_consent'] ) && $settings['gdpr_consent'] == 1 ){ $checked = 1; } else { $checked = 0; } ?>
 <tr>
-	<th><?php _e('Enable GDPR consent for login tracking', 'when-last-login'); ?></th>
+	<th><?php _e('Enable consent for login tracking', 'when-last-login'); ?></th>
 	<td><input type='checkbox' value='1' name='wll_gdpr_consent' <?php checked( 1, $checked ); ?>/></td>
 </tr>
 

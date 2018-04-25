@@ -23,7 +23,11 @@ class When_Last_Login {
       define( 'WLL_BASENAME', plugin_basename( __FILE__ ) );
       define( 'WLL_DIR_PATH', plugin_dir_path( __FILE__ ) );
 
-      include WLL_DIR_PATH . '/includes/gdpr.php';
+      $settings = get_option( 'wll_settings' );
+
+      if( ! empty( $settings['gdpr_consent'] ) ) {
+        include WLL_DIR_PATH . '/includes/gdpr.php';
+      }
 
       add_action( 'init', array( $this, 'init' ) );
       add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
