@@ -20,58 +20,57 @@ class When_Last_Login {
     */
     private function __construct() {        
 
-        define( 'WHEN_LAST_LOGIN_BNAME', plugin_basename( __FILE__ ) );
+      define( 'WLL_BASENAME', plugin_basename( __FILE__ ) );
+      define( 'WLL_DIR_PATH', plugin_dir_path( __FILE__ ) );
 
-        add_action( 'init', array( $this, 'init' ) );
-        add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
-        add_action( 'admin_enqueue_scripts', array( $this, 'load_js_for_notice' ) );
+      include WLL_DIR_PATH . '/includes/gdpr.php';
 
-        //Create the custom meta upon login
-        add_action( 'wp_login', array( $this, 'last_login'), 10, 2 );
-        add_action( 'user_register', array( $this, 'wll_user_register' ), 10, 1 );
+      add_action( 'init', array( $this, 'init' ) );
+      add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
+      add_action( 'admin_enqueue_scripts', array( $this, 'load_js_for_notice' ) );
 
-        //Admin actions
-        add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );      
-        add_action( 'admin_notices', array( $this, 'update_notice' ) );
+      //Create the custom meta upon login
+      add_action( 'wp_login', array( $this, 'last_login'), 10, 2 );
+      add_action( 'user_register', array( $this, 'wll_user_register' ), 10, 1 );
 
-        add_action( 'wp_ajax_save_update_notice', array( $this, 'save_update_notice' ) );
-        add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_save_subscription_notice' ) );
-        add_action( 'wp_ajax_wll_subscribe_user_newsletter', array( $this, 'wll_subscribe_user_newsletter_callback' ) );
+      //Admin actions
+      add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );      
+      add_action( 'admin_notices', array( $this, 'update_notice' ) );
 
-
-        //Setting up columns.
-        add_filter( 'manage_users_columns', array( $this, 'column_header'), 10, 1 );
-        add_action( 'manage_users_custom_column', array( $this, 'column_data'), 15, 3 );
-        add_filter( 'manage_users_sortable_columns', array( $this, 'column_sortable' ) );
-        add_action( 'pre_get_users', array( $this, 'sort_by_login_date') );
-
-        //Integration for Paid Memberships Pro
-        //TODO: Improve integration with Member List and Paid Memberships Pro
-        add_action( 'pmpro_memberslist_extra_cols_header', array( $this, 'pmpro_memberlist_add_header' ) );
-        add_action( 'pmpro_memberslist_extra_cols_body', array( $this, 'pmpro_memberlist_add_column_data' ) );
-        add_action( 'init', array( $this, 'login_record_cp' ) );
-
-        add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
-        add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
-        add_filter( 'plugin_row_meta', array( $this, 'wll_plugin_row_meta' ), 10, 2 );
+      add_action( 'wp_ajax_save_update_notice', array( $this, 'save_update_notice' ) );
+      add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_save_subscription_notice' ) );
+      add_action( 'wp_ajax_wll_subscribe_user_newsletter', array( $this, 'wll_subscribe_user_newsletter_callback' ) );
 
 
-        add_filter( 'plugin_action_links_' . WHEN_LAST_LOGIN_BNAME, array( $this, 'wll_plugin_action_links' ), 10, 2 );
+      //Setting up columns.
+      add_filter( 'manage_users_columns', array( $this, 'column_header'), 10, 1 );
+      add_action( 'manage_users_custom_column', array( $this, 'column_data'), 15, 3 );
+      add_filter( 'manage_users_sortable_columns', array( $this, 'column_sortable' ) );
+      add_action( 'pre_get_users', array( $this, 'sort_by_login_date') );
 
+      //Integration for Paid Memberships Pro
+      //TODO: Improve integration with Member List and Paid Memberships Pro
+      add_action( 'pmpro_memberslist_extra_cols_header', array( $this, 'pmpro_memberlist_add_header' ) );
+      add_action( 'pmpro_memberslist_extra_cols_body', array( $this, 'pmpro_memberlist_add_column_data' ) );
+      add_action( 'init', array( $this, 'login_record_cp' ) );
 
-        //add plugin row_meta here
+      add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
+      add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
 
-        add_filter( 'manage_wll_records_posts_columns' , array( $this, 'wll_records_columns'), 10, 1 );
-        add_action( 'manage_wll_records_posts_custom_column' , array( $this, 'wll_records_column_contents' ), 10, 2 );
+      add_filter( 'plugin_row_meta', array( $this, 'wll_plugin_row_meta' ), 10, 2 );
+      add_filter( 'plugin_action_links_' . WLL_BASENAME, array( $this, 'wll_plugin_action_links' ), 10, 2 );
 
-        /**
-         * Multisite support
-         */
-        add_action( 'wp_network_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );
-        add_filter( 'wpmu_users_columns', array( $this, 'column_header'), 10, 1 );
-        add_action( 'wpmu_users_custom_column', array( $this, 'column_data'), 15, 3 );
+      add_filter( 'manage_wll_records_posts_columns' , array( $this, 'wll_records_columns'), 10, 1 );
+      add_action( 'manage_wll_records_posts_custom_column' , array( $this, 'wll_records_column_contents' ), 10, 2 );
 
-        register_activation_hook( __FILE__, array( $this, 'wll_login_attempts_activation' ) );
+      /**
+      * Multisite support
+      */
+      add_action( 'wp_network_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );
+      add_filter( 'wpmu_users_columns', array( $this, 'column_header'), 10, 1 );
+      add_action( 'wpmu_users_custom_column', array( $this, 'column_data'), 15, 3 );
+
+      register_activation_hook( __FILE__, array( $this, 'wll_login_attempts_activation' ) );
 
     }
 
@@ -100,7 +99,7 @@ class When_Last_Login {
     }
 
     public static function text_domain(){
-      load_plugin_textdomain( 'when-last-login', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+      load_plugin_textdomain( 'when-last-login', false, dirname( WLL_BASE_NAME ) . '/languages' );
     }
 
     public static function update_notice(){
@@ -181,6 +180,17 @@ class When_Last_Login {
     }
 
      public static function last_login( $user_login, $users ){
+
+      // check if user has given consent, if not don't track their data.
+      $settings = get_option( 'wll_settings' );
+
+      if ( 1 === $settings['gdpr_consent'] ) {
+        $consent_to_track = get_user_meta( $users->ID, 'wll_consent_to_track', true );
+
+        if ( empty( $consent_to_track ) && '1' != $consent_to_track ) {
+            return;
+        }
+      }
 
       global $show_login_records;
 
@@ -550,7 +560,7 @@ class When_Last_Login {
 
     public function wll_settings_callback(){
 
-      include plugin_dir_path( __FILE__ ).'/includes/settings.php';
+      include WLL_DIR_PATH . '/includes/settings.php';
 
     }
 
@@ -563,6 +573,8 @@ class When_Last_Login {
         $wll_settings['user_access'] = isset( $_POST['wll_login_record_user_access'] ) ? $_POST['wll_login_record_user_access'] : "";
         $wll_settings['record_ip_address'] = isset( $_POST['wll_record_user_ip_address'] ) && $_POST['wll_record_user_ip_address'] == '1'  ? 1 : 0;
         $wll_settings['show_all_login_records'] = isset( $_POST['wll_all_login_records'] ) && $_POST['wll_all_login_records'] == '1'  ? 1 : 0;
+        $wll_settings['gdpr_consent'] = isset( $_POST['wll_gdpr_consent'] ) && $_POST['wll_gdpr_consent'] == '1'  ? 1 : 0;
+        $wll_settings['registration_consent_text'] = isset( $_POST['wll_registration_consent_text'] ) && ! empty( $_POST['wll_registration_consent_text'] ) ? $_POST['wll_registration_consent_text'] : '';
 
 
         $wll_settings = apply_filters( 'wll_settings_filter', $wll_settings );
