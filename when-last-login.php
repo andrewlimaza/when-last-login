@@ -628,6 +628,8 @@ class When_Last_Login {
       } else {
         $ip = $_SERVER['REMOTE_ADDR'];
       }
+
+      $ip = apply_filters( 'wll_user_ip_address', $ip );
       
       return IpAnonymizer::anonymizeIp( $ip );
     }
