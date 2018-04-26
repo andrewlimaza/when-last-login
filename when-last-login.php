@@ -10,6 +10,8 @@ Text Domain: when-last-login
 Domain Path: /languages
 */
 
+use geertw\IpAnonymizer\IpAnonymizer;
+
 class When_Last_Login {
 
     /** Refers to a single instance of this class. */
@@ -25,9 +27,7 @@ class When_Last_Login {
 
       $settings = get_option( 'wll_settings' );
 
-      if( ! empty( $settings['gdpr_consent'] ) ) {
-        include WLL_DIR_PATH . '/includes/gdpr.php';
-      }
+      include WLL_DIR_PATH . '/includes/lib/ipAnonymizer.php';
 
       add_action( 'init', array( $this, 'init' ) );
       add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
@@ -185,17 +185,6 @@ class When_Last_Login {
 
      public static function last_login( $user_login, $users ){
 
-      // check if user has given consent, if not don't track their data.
-      $settings = get_option( 'wll_settings' );
-
-      if ( 1 === $settings['gdpr_consent'] ) {
-        $consent_to_track = get_user_meta( $users->ID, 'wll_consent_to_track', true );
-
-        if ( empty( $consent_to_track ) && '1' != $consent_to_track ) {
-            return;
-        }
-      }
-
       global $show_login_records;
 
        //get/update user meta 'when_last_login' on login and add time() to it.
@@ -225,14 +214,9 @@ class When_Last_Login {
         $wll_settings = get_option( 'wll_settings' );
 
         if( isset( $wll_settings['record_ip_address'] ) && $wll_settings['record_ip_address'] == 1 ){
-          
-          if( !empty( $_SERVER['HTTP_CLIENT_IP'] ) ){
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
-          } else if ( !empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ){
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-          } else {
-            $ip = $_SERVER['REMOTE_ADDR'];
-          }
+
+          // call function to anonymize here.
+          $ip = $this->wll_get_user_ip_address();
 
           update_post_meta( $post_id, 'wll_user_ip_address', $ip );
           update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
@@ -250,15 +234,8 @@ class When_Last_Login {
 
         if( isset( $wll_settings['record_ip_address'] ) && $wll_settings['record_ip_address'] == 1 ){
           
-          if( !empty( $_SERVER['HTTP_CLIENT_IP'] ) ){
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
-          } else if ( !empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ){
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-          } else {
-            $ip = $_SERVER['REMOTE_ADDR'];
-          }
-
-          update_user_meta( $user_id, 'wll_user_ip_address', $ip );
+        $ip = $this->wll_get_user_ip_address();
+        update_user_meta( $user_id, 'wll_user_ip_address', $ip );
 
         }
 
@@ -468,7 +445,7 @@ class When_Last_Login {
       $column['when_last_login'] = __( 'Last Login', 'when-last-login' );
 
       if ( ! empty( $settings['record_ip_address'] ) ) {
-        $column['when_last_login_ip_address'] = __( 'Last Logged In IP Address', 'when-last-login' );
+        $column['when_last_login_ip_address'] = __( 'IP Address', 'when-last-login' );
       }
       
 
@@ -577,9 +554,6 @@ class When_Last_Login {
         $wll_settings['user_access'] = isset( $_POST['wll_login_record_user_access'] ) ? $_POST['wll_login_record_user_access'] : "";
         $wll_settings['record_ip_address'] = isset( $_POST['wll_record_user_ip_address'] ) && $_POST['wll_record_user_ip_address'] == '1'  ? 1 : 0;
         $wll_settings['show_all_login_records'] = isset( $_POST['wll_all_login_records'] ) && $_POST['wll_all_login_records'] == '1'  ? 1 : 0;
-        $wll_settings['gdpr_consent'] = isset( $_POST['wll_gdpr_consent'] ) && $_POST['wll_gdpr_consent'] == '1'  ? 1 : 0;
-        $wll_settings['registration_consent_text'] = isset( $_POST['wll_registration_consent_text'] ) && ! empty( $_POST['wll_registration_consent_text'] ) ? $_POST['wll_registration_consent_text'] : '';
-
 
         $wll_settings = apply_filters( 'wll_settings_filter', $wll_settings );
 
@@ -643,6 +617,19 @@ class When_Last_Login {
         $links = array_merge( $links, $new_links );
       }
       return $links;
+    }
+
+    public static function wll_get_user_ip_address(){
+
+      if( !empty( $_SERVER['HTTP_CLIENT_IP'] ) ){
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+      } else if ( !empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ){
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+      } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+      }
+      
+      return IpAnonymizer::anonymizeIp( $ip );
     }
 
 } // end class
