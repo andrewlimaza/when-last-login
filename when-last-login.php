@@ -604,7 +604,7 @@ class When_Last_Login {
 
         global $wpdb;
       
-        $sql = "DELETE FROM $wpdb->posts WHERE `post_type` = 'wll_records'";
+        $sql = "DELETE p, pm FROM $wpdb->posts p INNER JOIN $wpdb->postmeta pm ON pm.post_id = p.ID WHERE p.post_type = 'wll_records'";
 
         if ( $_REQUEST['remove_all_wll_records'] ) {
           if ( $wpdb->query( $sql ) > 0 ) {
@@ -619,7 +619,7 @@ class When_Last_Login {
 
           $date = apply_filters( 'wll_automatically_remove_logs_date', date( 'Y-m-d', strtotime( '-3 months' ) ) );
 
-          $sql .= " AND `post_date` <= $date";
+          $sql .= " AND p.post_date >= $date";
 
           if ( $wpdb->query( $sql ) > 0 ) {
             add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );

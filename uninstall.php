@@ -18,8 +18,8 @@ foreach( $users_id as $user_id ){
   delete_user_meta( $user_id, 'wll_consent_to_track_date' );
 }
 
-//Delete CPT's from databse if you uninstall When Last Login.
-$sql = "DELETE FROM $wpdb->posts WHERE post_type='wll_records'";
+//Delete CPT's from databse if you uninstall When Last Login and Post Meta.
+$sql = "DELETE p, pm FROM $wpdb->posts p INNER JOIN $wpdb->postmeta pm ON pm.post_id = p.ID WHERE p.post_type = 'wll_records'";
 $wpdb->query( $sql );
 
 //Delete custom table if it exists
