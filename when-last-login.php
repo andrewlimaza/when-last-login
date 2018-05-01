@@ -60,6 +60,7 @@ class When_Last_Login {
 
       add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
       add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
+      add_action( 'admin_init', array( $this, 'wll_automatically_remove_logs' ) );
 
       add_filter( 'plugin_row_meta', array( $this, 'wll_plugin_row_meta' ), 10, 2 );
       add_filter( 'plugin_action_links_' . WLL_BASENAME, array( $this, 'wll_plugin_action_links' ), 10, 2 );
@@ -573,6 +574,61 @@ class When_Last_Login {
       </div>
     <?php
     }
+
+    public function wll_remove_records_notice__success() {
+    ?>
+      <div class="notice notice-success is-dismissible">
+        <p><?php _e( 'Records have been removed successfully.', 'when-last-login' ); ?></p>
+      </div>
+    <?php
+    }
+
+    public function wll_remove_records_notice__warning() {
+    ?>
+      <div class="notice notice-warning is-dismissible">
+        <p><?php _e( 'No old records to remove.', 'when-last-login' ); ?></p>
+      </div>
+    <?php
+    }
+
+    /**
+     * Function to remove logs automatically older than 3 months.
+     * @since 1.0.0
+     */
+    public function wll_automatically_remove_logs() {
+
+        // Bail if not on our settings page.
+        if( 'when-last-login-settings' != $_REQUEST['page'] ) {
+          return;
+        }
+
+        global $wpdb;
+      
+        $sql = "DELETE FROM $wpdb->posts WHERE `post_type` = 'wll_records'";
+
+        if ( $_REQUEST['remove_all_wll_records'] ) {
+          if ( $wpdb->query( $sql ) > 0 ) {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+          } else {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+          } 
+
+        }
+
+        if( $_REQUEST['remove_wll_records'] ) {
+
+          $date = apply_filters( 'wll_automatically_remove_logs_date', date( 'Y-m-d', strtotime( '-3 months' ) ) );
+
+          $sql .= " AND `post_date` <= $date";
+
+          if ( $wpdb->query( $sql ) > 0 ) {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+          } else {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+          } 
+        }
+    }
+
 
     public function wll_records_columns( $columns ){
 
