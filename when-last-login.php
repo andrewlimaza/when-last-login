@@ -24,6 +24,7 @@ class When_Last_Login {
 
       define( 'WLL_BASENAME', plugin_basename( __FILE__ ) );
       define( 'WLL_DIR_PATH', plugin_dir_path( __FILE__ ) );
+      define( 'WLL_PLUGIN', WP_PLUGIN_URL . '/when-last-login' );
 
       $settings = get_option( 'wll_settings' );
 
