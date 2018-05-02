@@ -24,8 +24,9 @@
 	</tr>
 	<!-- loaded from general.php -->
 	<?php 
-		$old_records_message = __( 'Are you sure you want to clear records older than 3 months?', 'when-last-login' );
-		$all_records_message = __( 'Are you sure you want to clear all login records?', 'when-last-login' );
+		$old_records_message = __( 'Are you sure you want to remove all records older than 3 months?', 'when-last-login' );
+		$all_records_message = __( 'Are you sure you want to remove all login records?', 'when-last-login' );
+		$all_ip_message = __( 'Are you sure you want to remove all IP addresses?', 'when-last-login' );
 	?>
 
 		<script>
@@ -40,6 +41,12 @@
 					window.location.href = "<?php echo admin_url( 'admin.php?page=when-last-login-settings&remove_all_wll_records=1' ); ?>";
 				}
 			}
+
+			function wll_remove_all_ips(){
+				if( window.confirm('<?php echo $all_ip_message; ?>')) {
+					window.location.href = "<?php echo admin_url( 'admin.php?page=when-last-login-settings&remove_wll_ip_addresses=1' ); ?>";
+				}
+			}
 	</script>
 
 	<tr>
@@ -50,6 +57,11 @@
 	<tr>
 		<th><?php _e( 'Clear all logs', 'when-last-login' ); ?></th>
 		<td><a href="javascript:void(0);" onclick="wll_remove_all_records(); return false;" class="button-primary"><?php _e( 'Run Now', 'when-last-login' ); ?></a></td>
+	</tr>
+
+	<tr>
+		<th><?php _e( 'Clear all IP Addresses', 'when-last-login' ); ?></th>
+		<td><a href="javascript:void(0);" onclick="wll_remove_all_ips(); return false;" class="button-primary"><?php _e( 'Run Now', 'when-last-login' ); ?></a></td>
 	</tr>
 
 	<tr>

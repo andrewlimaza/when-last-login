@@ -596,9 +596,10 @@ class When_Last_Login {
      * @since 1.0.0
      */
     public function wll_automatically_remove_logs() {
+      global $pagenow;
 
         // Bail if not on our settings page.
-        if( 'when-last-login-settings' != $_REQUEST['page'] ) {
+        if ( 'admin.php' == $pagenow && 'when-last-login-settings' != $_GET['page'] ) {
           return;
         }
 
@@ -606,7 +607,7 @@ class When_Last_Login {
       
         $sql = "DELETE p, pm FROM $wpdb->posts p INNER JOIN $wpdb->postmeta pm ON pm.post_id = p.ID WHERE p.post_type = 'wll_records'";
 
-        if ( $_REQUEST['remove_all_wll_records'] ) {
+        if ( isset( $_REQUEST['remove_all_wll_records'] ) ) {
           if ( $wpdb->query( $sql ) > 0 ) {
             add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
           } else {
@@ -615,7 +616,7 @@ class When_Last_Login {
 
         }
 
-        if( $_REQUEST['remove_wll_records'] ) {
+        if ( isset( $_REQUEST['remove_wll_records'] ) ) {
 
           $date = apply_filters( 'wll_automatically_remove_logs_date', date( 'Y-m-d', strtotime( '-3 months' ) ) );
 
@@ -626,6 +627,17 @@ class When_Last_Login {
           } else {
             add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
           } 
+        }
+
+        if ( isset( $_REQUEST['remove_wll_ip_addresses'] ) ) {
+          $sql = "DELETE FROM $wpdb->usermeta WHERE meta_key = 'wll_user_ip_address'";
+
+          if ( $wpdb->query( $sql ) > 0 ) {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+          } else {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+          } 
+
         }
     }
 
@@ -641,7 +653,7 @@ class When_Last_Login {
       switch ( $column ) {
         case 'wll-ip-address':
           $ip_address = get_post_meta( $post_id, 'wll_user_ip_address', true );
-          if ( $ip_address && $ip_address != "" ) {
+          if ( ! empty( $ip_address ) && $ip_address != "" ) {
             echo "<a href='http://www.ip-adress.com/ip_tracer/".$ip_address."' target='_BLANK' title='".__( 'Lookup', 'when-last-login' )."'>".$ip_address."</a>";
           } else {
             _e( 'IP Address Not Recorded', 'when-last-login' );
