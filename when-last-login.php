@@ -30,7 +30,7 @@ class When_Last_Login {
 
       include WLL_DIR_PATH . '/includes/lib/ipAnonymizer.php';
 
-      add_action( 'init', array( $this, 'init' ) );
+      add_action( 'admin_init', array( $this, 'admin_init' ) );
       add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
       add_action( 'admin_enqueue_scripts', array( $this, 'load_js_for_notice' ) );
 
@@ -42,7 +42,6 @@ class When_Last_Login {
       add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );      
       add_action( 'admin_notices', array( $this, 'update_notice' ) );
 
-      add_action( 'wp_ajax_save_update_notice', array( $this, 'save_update_notice' ) );
       add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_save_subscription_notice' ) );
       add_action( 'wp_ajax_wll_subscribe_user_newsletter', array( $this, 'wll_subscribe_user_newsletter_callback' ) );
 
@@ -95,12 +94,34 @@ class When_Last_Login {
     /**
     * When Last plugin functions.
     */
-    public static function init(){
+    public static function admin_init(){
     //init function
-    
-      if( floatval( get_option( 'wll_current_version' ) ) !== 0.9 ){
-        delete_transient( 'when_last_login_add_ons_page' );
-        update_option( 'wll_current_version', 0.9 );
+      if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+      }
+
+      do_action( 'wll_upgrade_check' );
+
+      $current_version = floatval( get_option( 'wll_current_version' ) );
+
+      // Clean up stuff for version 1.0
+      if( $current_version < 1.0 || empty( $current_version ) ) {
+
+        global $wpdb;
+
+        $delete_table = $wpdb->prefix . 'wll_login_attempts' ;
+        $sql = "DROP TABLE IF EXISTS `$delete_table`";
+        $wpdb->query( $sql );
+
+        // delete_transient( 'when_last_login_add_ons_page' );
+
+        // on upgrade remove the notice save.
+        delete_option( 'wll_notice_hide' );
+        delete_option( 'wll_notice_hide_1' );
+        delete_option( 'wll_notice_hide_2' );
+
+        // update version number to 1.0
+       update_option( 'wll_current_version', 1.0 );
       }
     }
 
@@ -110,21 +131,7 @@ class When_Last_Login {
 
     public static function update_notice(){
 
-      //clean up old notice option in database since we don't need this anymore. (Increment _1 or _2 etc.)
-      if( get_option( 'wll_notice_hide') == '1' ){
-        delete_option( 'wll_notice_hide' );
-      }
-
-      //this creates the dissmissible notice
-      if( get_option( 'wll_notice_hide_1' ) !== '1'){
-        ?>
-        <div class="notice notice-success  wll-update-notice is-dismissible" >
-        <p><?php printf( __( 'Thank you for using When Last Login. If you find this plugin useful please consider leaving a 5 star review %s. View the changelog %s', 'when-last-login' ), '<a href="https://wordpress.org/support/plugin/when-last-login/reviews/" target="_blank">here</a>', '<a href="https://whenlastlogin.com#updates" target="_blank">here</a>' ); ?></p>
-        </div>
-        <?php
-      }
-
-      if( get_option( 'wll_notice_hide_2' ) !== '1'){
+      if( get_option( 'wll_notice_hide' ) != '1' ){
         ?>
         <div class="notice notice-success  wll-update-notice-newsletter is-dismissible" >
         <h3><?php _e('When Last Login', 'when-last-login'); ?></h3>
@@ -135,13 +142,8 @@ class When_Last_Login {
       }
     }
 
-    public static function save_update_notice(){
-      //update the hide notice option
-      update_option( 'wll_notice_hide_1', '1' );
-    }
-
     public function wll_save_subscription_notice(){
-      update_option( 'wll_notice_hide_2', '1' );
+      update_option( 'wll_notice_hide', '1' );
     }
 
     public function wll_subscribe_user_newsletter_callback(){
@@ -157,7 +159,7 @@ class When_Last_Login {
 
             if( $request_body == 'subscribed' ){
               echo '1';
-              update_option( 'wll_notice_hide_2', '1' );
+              update_option( 'wll_notice_hide', '1' );
             }
 
           } else {
@@ -177,7 +179,7 @@ class When_Last_Login {
     }
 
     public static function load_js_for_notice(){
-      if( get_option( 'wll_notice_hide_1' ) !== '1' || get_option( 'wll_notice_hide_2' ) !== '2' ){
+      if( get_option( 'wll_notice_hide' ) !== '1'){
         wp_enqueue_script( 'wll_notice_update', plugins_url( 'js/notice-update.js', __FILE__ ), array( 'jquery' ), '1.0', false );
       }
       if( isset( $_GET['page'] ) && $_GET['page'] == 'when-last-login-settings' ){
