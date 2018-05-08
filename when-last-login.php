@@ -535,8 +535,10 @@ class When_Last_Login {
 
     public function wll_settings_page(){
 
-      add_menu_page( __('When Last Login', 'when-last-login'), __('When Last Login', 'when-last-login'), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+      add_menu_page( __('When Last Login', 'when-last-login'), __('When Last Login', 'when-last-login'), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ), 'dashicons-visibility');
+
       add_submenu_page( 'when-last-login-settings', __('Settings', 'when-last-login'), __('Settings', 'when-last-login'), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+
       add_submenu_page( 'when-last-login-settings', __('Extensions', 'when-last-login'), __('Extensions', 'when-last-login'), 'manage_options', 'admin.php?page=when-last-login-settings&tab=add-ons' );
       
       do_action( 'wll_settings_admin_menu_item' );
@@ -623,7 +625,7 @@ class When_Last_Login {
 
           $date = apply_filters( 'wll_automatically_remove_logs_date', date( 'Y-m-d', strtotime( '-3 months' ) ) );
 
-          $sql .= " AND p.post_date >= $date";
+          $sql .= " AND p.post_date <= '$date'";
 
           if ( $wpdb->query( $sql ) > 0 ) {
             add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
