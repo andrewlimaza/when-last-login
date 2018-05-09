@@ -607,7 +607,7 @@ class When_Last_Login {
 
         global $wpdb;
       
-        $sql = "DELETE p, pm FROM $wpdb->posts p INNER JOIN $wpdb->postmeta pm ON pm.post_id = p.ID WHERE p.post_type = 'wll_records'";
+        $sql = "DELETE p, pm FROM $wpdb->posts p LEFT JOIN $wpdb->postmeta pm ON pm.post_id = p.ID WHERE p.post_type = 'wll_records'";
 
         if ( isset( $_REQUEST['remove_all_wll_records'] ) ) {
           if ( $wpdb->query( $sql ) > 0 ) {
