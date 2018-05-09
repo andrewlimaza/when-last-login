@@ -42,7 +42,7 @@ class When_Last_Login {
       add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );      
       add_action( 'admin_notices', array( $this, 'update_notice' ) );
 
-      add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_save_subscription_notice' ) );
+      add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_hide_subscription_notice' ) );
       add_action( 'wp_ajax_wll_subscribe_user_newsletter', array( $this, 'wll_subscribe_user_newsletter_callback' ) );
 
 
@@ -74,9 +74,6 @@ class When_Last_Login {
       add_action( 'wp_network_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );
       add_filter( 'wpmu_users_columns', array( $this, 'column_header'), 10, 1 );
       add_action( 'wpmu_users_custom_column', array( $this, 'column_data'), 15, 3 );
-
-      register_activation_hook( __FILE__, array( $this, 'wll_login_attempts_activation' ) );
-
     }
 
     /**
@@ -142,7 +139,7 @@ class When_Last_Login {
       }
     }
 
-    public function wll_save_subscription_notice(){
+    public function wll_hide_subscription_notice(){
       update_option( 'wll_notice_hide', '1' );
     }
 
