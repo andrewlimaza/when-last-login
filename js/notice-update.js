@@ -1,14 +1,3 @@
-jQuery(document).on( 'click', '.wll-update-notice .notice-dismiss', function() {
-
-    jQuery.ajax({
-        url: ajaxurl,
-        data: {
-            action: 'save_update_notice'
-        }
-    })
-
-})
-
 jQuery(document).on( 'click', '.wll-update-notice-newsletter .notice-dismiss', function() {
 
     jQuery.ajax({
@@ -18,7 +7,7 @@ jQuery(document).on( 'click', '.wll-update-notice-newsletter .notice-dismiss', f
         }
     })
 
-})
+});
 
 jQuery(document).on( 'click', '#wll_subscribe_user', function(){
 

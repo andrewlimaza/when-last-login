@@ -3,7 +3,7 @@ Contributors: andrewza, yoohooplugins, travislima
 Tags: last login, user login, user login time, last logged in, last seen, user last seen, WordPress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen, last login WordPress
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
 Requires at least: 4.0
-Tested up to: 4.8
+Tested up to: 4.9
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv2 or later
@@ -12,12 +12,12 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Show a users last login date by creating a sortable column in your WordPress users list.
 
 == Description ==
-A lightweight plugin that allows you to see active users according to their last login time/date. No need to configure, simply activate When Last and you're ready to go! This adds a custom column to your WordPress users list of "Last Login" and a timestamp linked to that user. When Last also integrates with other plugins and now offers some more features.
+A lightweight plugin that allows you to see active users according to their last login time/date. No need to configure, simply activate When Last and you're ready to go! This adds a custom column to your WordPress users list of "Last Login" and a timestamp linked to that user.
 
 = Features =
 * Show when last a user has logged into your site.
 * Sorts users according to last login time stamp (Ascending/Descending) in the WordPress user list.
-* Administrator widget for top 3 users according to login statistics.
+* Administrator widget for top 3 users according to login count.
 * Integrates with Paid Memberships Pro  1.8+ - Add's a 'Last Logged In' column to the 'Members List'.
 * Generates a login history table under 'When Last Login' > 'All Login Records'. 
 * Hooks and filters for developers.
@@ -46,26 +46,9 @@ Here is a list of plugins we currently support:
 
 If you have a plugin and would like to integrate with When Last Login, please open a support thread.
 
-= Upcoming Features =
-Please note that these features are not guaranteed to be released and may change at our discretion.
-
-* Automatic customizable emails to users that haven't logged into your site after X days/months.
-* Integration with other plugins - Works with Paid Memberships Pro, more plugins to be announced.
-* Show last login details for specific WordPress roles.
-* Disable certain users from logging in.
-
-* Keep track of login count per user - COMPLETED
-* Statistics of top logged in users - COMPLETED
-* When Last Filters - COMPLETED
 
 = Need Help =
-We currently offer three channels for support:
-
-1. [The WordPress.org repository](https://wordpress.org/support/plugin/when-last-login)
-2. [YooHoo Plugins support forums](https://yoohooplugins.com/support/)
-3. [YooHoo Plugins email support](https://yoohooplugins.com/forums/forum/support-forum/)
-
-We will try our best to assist you to the best of our ability.
+Something not working as intended or have a question about functionality of When Last Login. [Open a support thread](https://wordpress.org/support/plugin/when-last-login)
 
 == Installation ==
 1. Upload the plugin files to the '/wp-content/plugins' directory, or install the plugin through the WordPress plugins screen directly.
@@ -78,11 +61,17 @@ We will try our best to assist you to the best of our ability.
 = What does When Last Login do exactly? =
 When Last Login allows you to see when last users have logged into your WordPress website. This is great for big sites that require user management. 
 
+= Is When Last Login GDPR ready? =
+Since version 1.0, we have made it easier to be GDPR compliant. With this being said, you need to take the necessary steps in order to become GDPR compliant - we are not a law firm! To help get GDPR ready with When Last Login for existing users, [view this link](https://yoohooplugins.com/when-last-login-and-gdpr/)
+
 = Is this plugin free? =
 Yes, When Last Login is a free plugin for WordPress. We are looking into possibilities of creating a Pro version with a lot more features around the user data of WordPress users. We rely heavily on donations to keep all of our plugins free. If you wish to donate, please click on the donation link on the WordPress repository.
 
 = Where is the When Last Login settings page? =
-This can be found by hovering over the 'When Last Login' menu item and clicking on 'Settings'.
+The settings page is found under the menu item 'When Last Login' within the WordPress dashboard.
+
+= How can I remove data I no longer need? =
+Inside your WordPress dashboard, navigate to 'When Last Login' -> 'Settings'. Under the 'Tools' heading, you will have a couple of actions that you can run, such as clear old login records, clear all login records and clear IP Addresses.
 
 = I have installed When Last but users are showing "Never" under "Last Login"? =
 This is because users have not logged in since you have activated "When Last Login". By default we set the "Last Login" to "Never" but this can be easily changed. Once a user logs into your site, their profile will be updated from "Never" to a timestamp.
@@ -92,14 +81,10 @@ As of version 0.6 the 'Login Records' has been moved under the 'Users' link in t
 Version 0.7 introduced a settings page menu item. The 'Login Records' can now be found under the 'When Last Login' menu item. 
 
 = How can I hide the 'All Login Records'? =
-Add the following snippet of code to your theme's functions.php or custom plugin -
-
-add_filter( 'when_last_login_show_records_table', '__return_false' );
+Inside your WordPress dashboard navigate to 'When Last Login' -> 'Settings' and deselect this option.
 
 = How can I hide the 'Top 3 Users' widget? =
-Add the following snippet of code to your theme's functions.php or custom plugin -
-
-add_filter( 'when_last_login_show_admin_widget', '__return_false' );
+Add the following snippet of code to your theme's functions.php or custom plugin - add_filter( 'when_last_login_show_admin_widget', '__return_false' );
 
 
 == Screenshots ==
@@ -108,12 +93,19 @@ add_filter( 'when_last_login_show_admin_widget', '__return_false' );
 
 == Changelog ==
 
-= 0.9 22-08-2017 =
+= 1.0 =
+* Enhancement: Changed admin icon for menu.
+* Enhancement: Added in tools to delete existing data from WordPress dashboard.
+* Enhancement: Added in IP Anonymization for IP address tracking to support GDPR.
+* Bug Fix: Removed IP address column from users table, if not recording IP's.
+* Enhancement/Bug Fix: General speed improvements where possible.
+
+= 0.9 =
 * Enhancement: Multisite Support - Dashboard widget
 * Enhancement: Multisite Support - User activity is now visible in the network admin's 'Users' page
 * Bug Fix: Fixed an undefined variable when logging in
 
-* 0.8 07-06-2017
+= 0.8 =
 * Enhancement: If enabled, user's IP address is availableon the 'Users' profile page
 * Enhancement: If enabled, user's IP address is recorded on registration
 * Improvements to add-ons page

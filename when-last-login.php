@@ -2,55 +2,15 @@
 /*
 Plugin Name: When Last Login
 Plugin URI: https://wordpress.org/plugins/when-last-login/
-Description: Adds functionality to WordPress to show when a user last logged in.
-Version: 0.9
-Author: YooHoo Plugins
+Description: See when a user logs into your WordPress site.
+Version: 1.0
+Author: Yoohoo Plugins
 Author URI: https://yoohooplugins.com
 Text Domain: when-last-login
 Domain Path: /languages
-  
-  * 0.9
-  * Enhancement: Multisite Support - Dashboard widget
-  * Enhancement: Multisite Support - User activity is now visible in the network admin's 'Users' page
-  * Bug Fix: Fixed an undefined variable when logging in
-  * 
-  * 0.8 07-06-2017
-  * Enhancement: If enabled, user's IP address is available on the 'Users' profile page
-  * Enhancement: If enabled, user's IP address is recorded on registration
-  * Improvements to add-ons page
-  * Enhancement: User IP address is now visible for each login record if enabled
-  * 
-  * 0.7 26-05-2017
-  * New Feature: Settings page introduced
-  * New Feature: Ability to record a user's IP address when logging in
-  * Enhancement: Login Records moved under the 'When Last Login' menu item
-  * New Hook Added: 'wll_settings_admin_menu_item'
-  * New Hook Added: 'wll_logged_in_action'
-  * 
-  * 0.6 26-04-2017
-  * Filter: 'when_last_login_show_records_table'. Accepts bool (default = true)
-  * Filter: 'when_last_login_show_admin_widget'. Accepts bool (default = true)
-  * Enhancement: Moved 'Login Records' under 'Users' link.
-  *
-  * 0.5 29-09-2016
-  * Enhancement: Ability to see which users have logged in and at what times - Custom Post Type - @jarrydlong
-  * Bug Fix: return default value for column data if no data is found - @seagyn
-  * Enhancement: Improved code readability
-  *
-  * 0.4 29-08-2016
-  * Enhancement: Implemented widgetto display top logged in users
-  *
-  * 0.3 22-07-2016
-  * Enhancement: Implemented multi language support and a couple of language files.
-  * Language Support: French, Spanish, German and Italian
-  *
-  * 0.2 - 15-07-2016
-  * Bug Fixes: fixed missing 'static' on function 'sort_by_login_date'
-  * Error Handling: Check if 'Paid Memberships Pro' is installed, if not return from the function
-  *
-  * 0.1 - 15-07-2016
-  * Initial release
 */
+
+use geertw\IpAnonymizer\IpAnonymizer;
 
 class When_Last_Login {
 
@@ -62,51 +22,58 @@ class When_Last_Login {
     */
     private function __construct() {        
 
-        define( 'WHEN_LAST_LOGIN_BNAME', plugin_basename( __FILE__ ) );
+      define( 'WLL_BASENAME', plugin_basename( __FILE__ ) );
+      define( 'WLL_DIR_PATH', plugin_dir_path( __FILE__ ) );
+      define( 'WLL_PLUGIN', WP_PLUGIN_URL . '/when-last-login' );
 
-        add_action( 'init', array( $this, 'init' ) );
-        add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
-        add_action( 'admin_enqueue_scripts', array( $this, 'load_js_for_notice' ) );
+      $settings = get_option( 'wll_settings' );
 
-        //Create the custom meta upon login
-        add_action( 'wp_login', array( $this, 'last_login'), 10, 2 );
-        add_action( 'user_register', array( $this, 'wll_user_register' ), 10, 1 );
-        //Admin actions
-        add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );      
-        add_action( 'admin_notices', array( $this, 'update_notice' ) );
+      include WLL_DIR_PATH . '/includes/lib/ipAnonymizer.php';
 
-        add_action( 'wp_ajax_save_update_notice', array( $this, 'save_update_notice' ) );
-        add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_save_subscription_notice' ) );
-        add_action( 'wp_ajax_wll_subscribe_user_newsletter', array( $this, 'wll_subscribe_user_newsletter_callback' ) );
+      add_action( 'admin_init', array( $this, 'admin_init' ) );
+      add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
+      add_action( 'admin_enqueue_scripts', array( $this, 'load_js_for_notice' ) );
+
+      //Create the custom meta upon login
+      add_action( 'wp_login', array( $this, 'last_login'), 10, 2 );
+      add_action( 'user_register', array( $this, 'wll_user_register' ), 10, 1 );
+
+      //Admin actions
+      add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );      
+      add_action( 'admin_notices', array( $this, 'update_notice' ) );
+
+      add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_hide_subscription_notice' ) );
+      add_action( 'wp_ajax_wll_subscribe_user_newsletter', array( $this, 'wll_subscribe_user_newsletter_callback' ) );
 
 
-        //Setting up columns.
-        add_filter( 'manage_users_columns', array( $this, 'column_header'), 10, 1 );
-        add_action( 'manage_users_custom_column', array( $this, 'column_data'), 15, 3 );
-        add_filter( 'manage_users_sortable_columns', array( $this, 'column_sortable' ) );
-        add_action( 'pre_get_users', array( $this, 'sort_by_login_date') );
+      //Setting up columns.
+      add_filter( 'manage_users_columns', array( $this, 'column_header'), 10, 1 );
+      add_action( 'manage_users_custom_column', array( $this, 'column_data'), 15, 3 );
+      add_filter( 'manage_users_sortable_columns', array( $this, 'column_sortable' ) );
+      add_action( 'pre_get_users', array( $this, 'sort_by_login_date') );
 
-        //Integration for Paid Memberships Pro
-        //TODO: Improve integration with Member List and Paid Memberships Pro
-        add_action( 'pmpro_memberslist_extra_cols_header', array( $this, 'pmpro_memberlist_add_header' ) );
-        add_action( 'pmpro_memberslist_extra_cols_body', array( $this, 'pmpro_memberlist_add_column_data' ) );
-        add_action( 'init', array( $this, 'login_record_cp' ) );
+      //Integration for Paid Memberships Pro
+      //TODO: Improve integration with Member List and Paid Memberships Pro
+      add_action( 'pmpro_memberslist_extra_cols_header', array( $this, 'pmpro_memberlist_add_header' ) );
+      add_action( 'pmpro_memberslist_extra_cols_body', array( $this, 'pmpro_memberlist_add_column_data' ) );
+      add_action( 'init', array( $this, 'login_record_cp' ) );
 
-        add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
-        add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
+      add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
+      add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
+      add_action( 'admin_init', array( $this, 'wll_automatically_remove_logs' ) );
 
-        add_filter( 'manage_wll_records_posts_columns' , array( $this, 'wll_records_columns'), 10, 1 );
-        add_action( 'manage_wll_records_posts_custom_column' , array( $this, 'wll_records_column_contents' ), 10, 2 );
+      add_filter( 'plugin_row_meta', array( $this, 'wll_plugin_row_meta' ), 10, 2 );
+      add_filter( 'plugin_action_links_' . WLL_BASENAME, array( $this, 'wll_plugin_action_links' ), 10, 2 );
 
-        /**
-         * Multisite support
-         */
-        add_action( 'wp_network_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );
-        add_filter( 'wpmu_users_columns', array( $this, 'column_header'), 10, 1 );
-        add_action( 'wpmu_users_custom_column', array( $this, 'column_data'), 15, 3 );
+      add_filter( 'manage_wll_records_posts_columns' , array( $this, 'wll_records_columns'), 10, 1 );
+      add_action( 'manage_wll_records_posts_custom_column' , array( $this, 'wll_records_column_contents' ), 10, 2 );
 
-        register_activation_hook( __FILE__, array( $this, 'wll_login_attempts_activation' ) );
-
+      /**
+      * Multisite support
+      */
+      add_action( 'wp_network_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );
+      add_filter( 'wpmu_users_columns', array( $this, 'column_header'), 10, 1 );
+      add_action( 'wpmu_users_custom_column', array( $this, 'column_data'), 15, 3 );
     }
 
     /**
@@ -124,75 +91,44 @@ class When_Last_Login {
     /**
     * When Last plugin functions.
     */
-    public static function init(){
+    public static function admin_init(){
     //init function
-    
-      if( floatval( get_option( 'wll_current_version' ) ) !== 0.9 ){
-        delete_transient( 'when_last_login_add_ons_page' );
-        update_option( 'wll_current_version', 0.9 );
+      if ( ! current_user_can( 'manage_options' ) ) {
+        return;
       }
 
+      do_action( 'wll_upgrade_check' );
+
+      $current_version = floatval( get_option( 'wll_current_version' ) );
+
+      // Clean up stuff for version 1.0
+      if( $current_version < 1.0 || empty( $current_version ) ) {
+
+        global $wpdb;
+
+        $delete_table = $wpdb->prefix . 'wll_login_attempts' ;
+        $sql = "DROP TABLE IF EXISTS `$delete_table`";
+        $wpdb->query( $sql );
+
+        delete_transient( 'when_last_login_add_ons_page' );
+
+        // on upgrade remove the notice save.
+        delete_option( 'wll_notice_hide' );
+        delete_option( 'wll_notice_hide_1' );
+        delete_option( 'wll_notice_hide_2' );
+
+        // update version number to 1.0
+       update_option( 'wll_current_version', 1.0 );
+      }
     }
 
-    public function wll_login_attempts_activation(){
-
-        $settings = get_option( 'WLLLimitLoginAttempts' );
-
-        if( !$settings || $settings == "" ){
-
-          $settings_array = array(
-            'enabled' => 1,
-            'attempts' => 3,
-            'wait' => 60
-          );
-
-          update_option( 'WLLLimitLoginAttempts', $settings_array );
-
-          global $wpdb;
-
-          $table_name = $wpdb->prefix . 'wll_login_attempts';
-
-          $wpdb_collate = $wpdb->collate;
-
-          $sql =
-          "CREATE TABLE {$table_name} (
-            id int(11) unsigned NOT NULL auto_increment,
-            username varchar(255) NULL, 
-            ip_address varchar(255) NULL, 
-            time_slot varchar(255) NULL,
-            PRIMARY KEY  (id) 
-          ) 
-          COLLATE {$wpdb_collate}";
-
-          require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-          dbDelta( $sql );
-
-        }
-
-      }
-
-
     public static function text_domain(){
-      load_plugin_textdomain( 'when-last-login', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+      load_plugin_textdomain( 'when-last-login', false, dirname( 'WLL_BASE_NAME' ) . '/languages' );
     }
 
     public static function update_notice(){
 
-      //clean up old notice option in database since we don't need this anymore. (Increment _1 or _2 etc.)
-      if( get_option( 'wll_notice_hide') == '1' ){
-        delete_option( 'wll_notice_hide' );
-      }
-
-      //this creates the dissmissible notice
-      if( get_option( 'wll_notice_hide_1' ) !== '1'){
-        ?>
-        <div class="notice notice-success  wll-update-notice is-dismissible" >
-        <p><?php printf( __( 'Thank you for using When Last Login. If you find this plugin useful please consider leaving a 5 star review %s. View the changelog %s', 'when-last-login' ), '<a href="https://wordpress.org/support/plugin/when-last-login/reviews/" target="_blank">here</a>', '<a href="https://whenlastlogin.com#updates" target="_blank">here</a>' ); ?></p>
-        </div>
-        <?php
-      }
-
-      if( get_option( 'wll_notice_hide_2' ) !== '1'){
+      if( get_option( 'wll_notice_hide' ) != '1' ){
         ?>
         <div class="notice notice-success  wll-update-notice-newsletter is-dismissible" >
         <h3><?php _e('When Last Login', 'when-last-login'); ?></h3>
@@ -203,13 +139,8 @@ class When_Last_Login {
       }
     }
 
-    public static function save_update_notice(){
-      //update the hide notice option
-      update_option( 'wll_notice_hide_1', '1' );
-    }
-
-    public function wll_save_subscription_notice(){
-      update_option( 'wll_notice_hide_2', '1' );
+    public function wll_hide_subscription_notice(){
+      update_option( 'wll_notice_hide', '1' );
     }
 
     public function wll_subscribe_user_newsletter_callback(){
@@ -225,7 +156,7 @@ class When_Last_Login {
 
             if( $request_body == 'subscribed' ){
               echo '1';
-              update_option( 'wll_notice_hide_2', '1' );
+              update_option( 'wll_notice_hide', '1' );
             }
 
           } else {
@@ -234,7 +165,7 @@ class When_Last_Login {
 
         } else {
 
-          _e('Please enter in an email address to subscribe to our mailing list and receive your 20% coupon', 'when-last-login');
+          _e( 'Please enter in an email address to subscribe to our mailing list and receive your coupon', 'when-last-login' );
 
         }
 
@@ -245,7 +176,7 @@ class When_Last_Login {
     }
 
     public static function load_js_for_notice(){
-      if( get_option( 'wll_notice_hide_1' ) !== '1' || get_option( 'wll_notice_hide_2' ) !== '2' ){
+      if( get_option( 'wll_notice_hide' ) !== '1'){
         wp_enqueue_script( 'wll_notice_update', plugins_url( 'js/notice-update.js', __FILE__ ), array( 'jquery' ), '1.0', false );
       }
       if( isset( $_GET['page'] ) && $_GET['page'] == 'when-last-login-settings' ){
@@ -284,14 +215,9 @@ class When_Last_Login {
         $wll_settings = get_option( 'wll_settings' );
 
         if( isset( $wll_settings['record_ip_address'] ) && $wll_settings['record_ip_address'] == 1 ){
-          
-          if( !empty( $_SERVER['HTTP_CLIENT_IP'] ) ){
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
-          } else if ( !empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ){
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-          } else {
-            $ip = $_SERVER['REMOTE_ADDR'];
-          }
+
+          // call function to anonymize here.
+          $ip = $this->wll_get_user_ip_address();
 
           update_post_meta( $post_id, 'wll_user_ip_address', $ip );
           update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
@@ -309,15 +235,8 @@ class When_Last_Login {
 
         if( isset( $wll_settings['record_ip_address'] ) && $wll_settings['record_ip_address'] == 1 ){
           
-          if( !empty( $_SERVER['HTTP_CLIENT_IP'] ) ){
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
-          } else if ( !empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ){
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-          } else {
-            $ip = $_SERVER['REMOTE_ADDR'];
-          }
-
-          update_user_meta( $user_id, 'wll_user_ip_address', $ip );
+        $ip = $this->wll_get_user_ip_address();
+        update_user_meta( $user_id, 'wll_user_ip_address', $ip );
 
         }
 
@@ -329,7 +248,17 @@ class When_Last_Login {
 
       global $show_login_records;
 
-      $show_login_records = apply_filters( 'when_last_login_show_records_table', true );
+      $settings = get_option( 'wll_settings' );
+
+      $show = $settings['show_all_login_records'];
+
+      if( 1 === $show ) {
+        $show = true;
+      }else{
+        $show = false;
+      }
+
+      $show_login_records = apply_filters( 'when_last_login_show_records_table', $show );
 
       if( $show_login_records != true ){
         return;
@@ -512,14 +441,23 @@ class When_Last_Login {
      * Setup Column and data for users page with sortable
      */
      public static function column_header( $column ){
-       $column['when_last_login'] = __( 'Last Login', 'when-last-login' );
-       $column['when_last_login_ip_address'] = __( 'Last Logged In IP Address', 'when-last-login' );
+      $settings = get_option( 'wll_settings' );
+
+      $column['when_last_login'] = __( 'Last Login', 'when-last-login' );
+
+      if ( ! empty( $settings['record_ip_address'] ) ) {
+        $column['when_last_login_ip_address'] = __( 'IP Address', 'when-last-login' );
+      }
+      
 
        return $column;
      }
 
      public static function column_data( $value, $column_name, $id ){
-      if ($column_name == 'when_last_login'){
+
+      $settings = get_option( 'wll_settings' );
+
+      if ( $column_name == 'when_last_login' ){
 
         $when_last_login_meta = get_the_author_meta( 'when_last_login', $id );
 
@@ -539,7 +477,7 @@ class When_Last_Login {
 
           $when_last_login_ip_address = get_user_meta( $id, 'wll_user_ip_address', true );
 
-          if ( $when_last_login_ip_address && $when_last_login_ip_address != "" ) {
+          if ( $when_last_login_ip_address && $when_last_login_ip_address != "" && $settings['record_ip_address'] != "") {
             return "<a href='http://www.ip-adress.com/ip_tracer/".$when_last_login_ip_address."' target='_BLANK' title='".__( 'Lookup', 'when-last-login' )."'>".$when_last_login_ip_address."</a>";
           } else {
             return __( 'IP Address Not Recorded', 'when-last-login' );
@@ -594,8 +532,10 @@ class When_Last_Login {
 
     public function wll_settings_page(){
 
-      add_menu_page( __('When Last Login', 'when-last-login'), __('When Last Login', 'when-last-login'), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+      add_menu_page( __('When Last Login', 'when-last-login'), __('When Last Login', 'when-last-login'), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ), 'dashicons-visibility');
+
       add_submenu_page( 'when-last-login-settings', __('Settings', 'when-last-login'), __('Settings', 'when-last-login'), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+
       add_submenu_page( 'when-last-login-settings', __('Extensions', 'when-last-login'), __('Extensions', 'when-last-login'), 'manage_options', 'admin.php?page=when-last-login-settings&tab=add-ons' );
       
       do_action( 'wll_settings_admin_menu_item' );
@@ -604,7 +544,7 @@ class When_Last_Login {
 
     public function wll_settings_callback(){
 
-      include plugin_dir_path( __FILE__ ).'/includes/settings.php';
+      include WLL_DIR_PATH . '/includes/settings.php';
 
     }
 
@@ -616,14 +556,93 @@ class When_Last_Login {
 
         $wll_settings['user_access'] = isset( $_POST['wll_login_record_user_access'] ) ? $_POST['wll_login_record_user_access'] : "";
         $wll_settings['record_ip_address'] = isset( $_POST['wll_record_user_ip_address'] ) && $_POST['wll_record_user_ip_address'] == '1'  ? 1 : 0;
+        $wll_settings['show_all_login_records'] = isset( $_POST['wll_all_login_records'] ) && $_POST['wll_all_login_records'] == '1'  ? 1 : 0;
 
         $wll_settings = apply_filters( 'wll_settings_filter', $wll_settings );
 
-        update_option( 'wll_settings', $wll_settings );
+        if ( update_option( 'wll_settings', $wll_settings ) ) {
+          //show admin notice here.
+          add_action( 'admin_notices', array( $this, 'wll_admin_notices' ) );
+        }
 
       }
 
     }
+
+    public function wll_admin_notices() {
+    ?>
+      <div class="notice notice-success is-dismissible">
+        <p><?php _e( 'Settings saved successfully.', 'when-last-login' ); ?></p>
+      </div>
+    <?php
+    }
+
+    public function wll_remove_records_notice__success() {
+    ?>
+      <div class="notice notice-success is-dismissible">
+        <p><?php _e( 'Records have been removed successfully.', 'when-last-login' ); ?></p>
+      </div>
+    <?php
+    }
+
+    public function wll_remove_records_notice__warning() {
+    ?>
+      <div class="notice notice-warning is-dismissible">
+        <p><?php _e( 'No old records to remove.', 'when-last-login' ); ?></p>
+      </div>
+    <?php
+    }
+
+    /**
+     * Function to remove logs automatically older than 3 months.
+     * @since 1.0.0
+     */
+    public function wll_automatically_remove_logs() {
+      global $pagenow;
+
+        // Bail if not on our settings page.
+        if ( 'admin.php' == $pagenow && 'when-last-login-settings' != $_GET['page'] ) {
+          return;
+        }
+
+        global $wpdb;
+      
+        $sql = "DELETE p, pm FROM $wpdb->posts p LEFT JOIN $wpdb->postmeta pm ON pm.post_id = p.ID WHERE p.post_type = 'wll_records'";
+
+        if ( isset( $_REQUEST['remove_all_wll_records'] ) ) {
+          if ( $wpdb->query( $sql ) > 0 ) {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+          } else {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+          } 
+
+        }
+
+        if ( isset( $_REQUEST['remove_wll_records'] ) ) {
+
+          $date = apply_filters( 'wll_automatically_remove_logs_date', date( 'Y-m-d', strtotime( '-3 months' ) ) );
+
+          $sql .= " AND p.post_date <= '$date'";
+
+          if ( $wpdb->query( $sql ) > 0 ) {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+          } else {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+          } 
+        }
+
+        if ( isset( $_REQUEST['remove_wll_ip_addresses'] ) ) {
+          $sql = "DELETE FROM $wpdb->usermeta WHERE meta_key = 'wll_user_ip_address'";
+
+          if ( $wpdb->query( $sql ) > 0 ) {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+          } else {
+            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+          } 
+
+        }
+    }
+
 
     public function wll_records_columns( $columns ){
 
@@ -636,7 +655,7 @@ class When_Last_Login {
       switch ( $column ) {
         case 'wll-ip-address':
           $ip_address = get_post_meta( $post_id, 'wll_user_ip_address', true );
-          if ( $ip_address && $ip_address != "" ) {
+          if ( ! empty( $ip_address ) && $ip_address != "" ) {
             echo "<a href='http://www.ip-adress.com/ip_tracer/".$ip_address."' target='_BLANK' title='".__( 'Lookup', 'when-last-login' )."'>".$ip_address."</a>";
           } else {
             _e( 'IP Address Not Recorded', 'when-last-login' );
@@ -644,10 +663,46 @@ class When_Last_Login {
           break;
 
       }
+    }
 
+    public function wll_plugin_action_links( $links ) {
+      $new_links = array(
+        '<a href="' . admin_url('admin.php?page=when-last-login-settings') . '" title="' . esc_attr( __( 'View Settings', 'when-last-login' ) ) . '">' . __( 'Settings', 'when-last-login' ) . '</a>'
+      );
+
+      $new_links = apply_filters( 'wll_plugin_action_links', $new_links );
+
+      return array_merge( $new_links, $links );
+    }
+
+    public function wll_plugin_row_meta( $links, $file ) {
+      if ( strpos( $file, 'when-last-login.php' ) !== false ) {
+        $new_links = array(
+          '<a href="' . admin_url('admin.php?page=when-last-login-settings') . '" title="' . esc_attr( __( 'View Settings', 'when-last-login' ) ) . '">' . __( 'Settings', 'when-last-login' ) . '</a>',
+          '<a href="' . esc_url( 'https://yoohooplugins.com/?s=when+last+login' ) . '" title="' . esc_attr( __( 'View Documentation', 'when-last-login' ) ) . '">' . __( 'Docs', 'when-last-login' ) . '</a>',
+          '<a href="' . esc_url( 'https://yoohooplugins.com/support/' ) . '" title="' . esc_attr( __( 'Visit Customer Support Forum', 'when-last-login' ) ) . '">' . __( 'Support', 'when-last-login' ) . '</a>',
+        );
+
+        $new_links = apply_filters( 'wll_plugin_row_meta', $new_links );
+        $links = array_merge( $links, $new_links );
+      }
+      return $links;
+    }
+
+    public static function wll_get_user_ip_address(){
+
+      if( !empty( $_SERVER['HTTP_CLIENT_IP'] ) ){
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+      } else if ( !empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ){
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+      } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+      }
+
+      $ip = apply_filters( 'wll_user_ip_address', $ip );
+      
+      return IpAnonymizer::anonymizeIp( $ip );
     }
 
 } // end class
 When_Last_Login::get_instance();
-
-// include plugin_dir_path( __FILE__ ).'/includes/when_last_login_limit_logins.class.php';

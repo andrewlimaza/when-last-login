@@ -2,11 +2,11 @@
 
 $tabs = array(
 	'general' => array(
-		'title' => __('General', 'when-last-login'),
+		'title' => __( 'General', 'when-last-login' ),
 		'icon' => ''
 	),
 	'add-ons' => array(
-		'title' => __('Add-ons', 'when-last-login'),
+		'title' => __( 'Add-ons', 'when-last-login' ),
 		'icon' => ''
 	)
 );
@@ -15,6 +15,7 @@ $tabs = apply_filters( 'wll_settings_page_tabs', $tabs );
 
 ?>
 
+<img src="<?php echo WLL_PLUGIN . '/includes/images/whenlastlogin.png'; ?>" width="300px" height="auto" style="margin-top:2%;"/>
 <div class='wrap'>
 
 	<h2 class="nav-tab-wrapper"><?php
