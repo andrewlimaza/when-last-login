@@ -3,7 +3,7 @@
 Plugin Name: When Last Login
 Plugin URI: https://wordpress.org/plugins/when-last-login/
 Description: See when a user logs into your WordPress site.
-Version: 1.0
+Version: 1.1
 Author: Yoohoo Plugins
 Author URI: https://yoohooplugins.com
 Text Domain: when-last-login
@@ -212,6 +212,8 @@ class When_Last_Login {
 
         $post_id = wp_insert_post( $args );
 
+      }
+
         $wll_settings = get_option( 'wll_settings' );
 
         if( isset( $wll_settings['record_ip_address'] ) && $wll_settings['record_ip_address'] == 1 ){
@@ -219,13 +221,14 @@ class When_Last_Login {
           // call function to anonymize here.
           $ip = $this->wll_get_user_ip_address();
 
-          update_post_meta( $post_id, 'wll_user_ip_address', $ip );
-          update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
+          if ( ! empty( $post_id ) ) {
+            update_post_meta( $post_id, 'wll_user_ip_address', $ip );
+          }
+          
+            update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
         }
 
         do_action( 'wll_logged_in_action', array( 'login_count' => $wll_new_value, 'user' => $users ), $wll_settings );
-
-      }
 
      }
 
