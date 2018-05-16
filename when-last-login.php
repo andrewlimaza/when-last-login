@@ -28,7 +28,7 @@ class When_Last_Login {
 
       $settings = get_option( 'wll_settings' );
 
-      include WLL_DIR_PATH . '/includes/lib/ipAnonymizer.php';
+      include WLL_DIR_PATH . '/includes/lib/IpAnonymizer.php';
 
       add_action( 'admin_init', array( $this, 'admin_init' ) );
       add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
@@ -212,20 +212,23 @@ class When_Last_Login {
 
         $post_id = wp_insert_post( $args );
 
+      }
+
         $wll_settings = get_option( 'wll_settings' );
 
         if( isset( $wll_settings['record_ip_address'] ) && $wll_settings['record_ip_address'] == 1 ){
 
           // call function to anonymize here.
-          $ip = $this->wll_get_user_ip_address();
+          $ip = When_Last_Login::wll_get_user_ip_address();
 
-          update_post_meta( $post_id, 'wll_user_ip_address', $ip );
-          update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
+          if ( ! empty( $post_id ) ) {
+            update_post_meta( $post_id, 'wll_user_ip_address', $ip );
+          }
+          
+            update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
         }
 
         do_action( 'wll_logged_in_action', array( 'login_count' => $wll_new_value, 'user' => $users ), $wll_settings );
-
-      }
 
      }
 
@@ -235,7 +238,7 @@ class When_Last_Login {
 
         if( isset( $wll_settings['record_ip_address'] ) && $wll_settings['record_ip_address'] == 1 ){
           
-        $ip = $this->wll_get_user_ip_address();
+        $ip = When_Last_Login::wll_get_user_ip_address();
         update_user_meta( $user_id, 'wll_user_ip_address', $ip );
 
         }
