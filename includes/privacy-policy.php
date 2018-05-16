@@ -35,8 +35,12 @@ function wll_get_default_privacy_content() {
  * Add the suggested privacy policy text to the policy postbox.
  */
 function wll_add_suggested_privacy_content() {
-	$content = wll_get_default_privacy_content();
-	wp_add_privacy_policy_content( __( 'When Last Login', 'when-last-login' ), $content );
+
+	if ( function_exists( 'wp_add_privacy_policy_content' ) ) {
+		$content = wll_get_default_privacy_content();
+		wp_add_privacy_policy_content( __( 'When Last Login', 'when-last-login' ), $content );
+	}
+	
 }
 add_action( 'admin_init', 'wll_add_suggested_privacy_content', 20 );
 
