@@ -347,7 +347,8 @@ class When_Last_Login {
                     </tr>                      
                     <?php
 
-                    $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'ASC', 'oderby' => 'meta_value', 'number' => 3, 'blog_id' => $blog_id ) );
+                    $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'ASC', 'or
+                    derby' => 'meta_value', 'number' => 3, 'blog_id' => $blog_id ) );
 
                     $topusers = $user_query->get_results();
 
