@@ -5,7 +5,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Requires at least: 4.0
 Tested up to: 4.9
 Requires PHP: 5.6
-Stable tag: trunk
+Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,7 +62,7 @@ Something not working as intended or have a question about functionality of When
 When Last Login allows you to see when last users have logged into your WordPress website. This is great for big sites that require user management. 
 
 = Is When Last Login GDPR ready? =
-Since version 1.0, we have made it easier to be GDPR compliant. With this being said, you need to take the necessary steps in order to become GDPR compliant - we are not a law firm! To help get GDPR ready with When Last Login for existing users, [view this link](https://yoohooplugins.com/when-last-login-and-gdpr/)
+Since version 1.0, we have made it easier to be GDPR compliant. With this being said, you need to take the necessary steps in order to become GDPR compliant - we are not a law firm!
 
 = Is this plugin free? =
 Yes, When Last Login is a free plugin for WordPress. We are looking into possibilities of creating a Pro version with a lot more features around the user data of WordPress users. We rely heavily on donations to keep all of our plugins free. If you wish to donate, please click on the donation link on the WordPress repository.
@@ -92,6 +92,10 @@ Add the following snippet of code to your theme's functions.php or custom plugin
 2. When Last Login - Show top 3 user login (includes 'administrators' in free version)
 
 == Changelog ==
+
+= 1.1 =
+* Enhancement: Support Privacy Changes coming to WordPress 4.9.6
+* Enhancement: Additional Hooks added.
 
 = 1.0 =
 * Enhancement: Changed admin icon for menu.
@@ -123,8 +127,6 @@ Add the following snippet of code to your theme's functions.php or custom plugin
 * Filter: 'when_last_login_show_records_table'. Accepts boolean (default: true).
 * Filter: 'when_last_login_show_admin_widget'. Accepts boolean (default: true).
 
-Please have a look over at https://whenlastlogin.com#updates for more information.
-
 = 0.5 =
 * Enhancement: Ability to see which users have logged in and at what times ( Custom Post Type ) - @jarrydlong 
 * Bug Fix: return default value for column data if no data is found - @seagyn
@@ -145,6 +147,9 @@ Please have a look over at https://whenlastlogin.com#updates for more informatio
 * First Release
 
 == Upgrade Notice ==
+= 1.1 =
+* Please update When Last Login to ensure you are running the latest version which includes changes for GDPR compliances and WordPress 4.9.6
+
 = 0.6 =
 * Please update When Last Login to receive new features. Love When Last Login? Buy the developer a cup of coffee! $5.
 
