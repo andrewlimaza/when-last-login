@@ -254,13 +254,7 @@ class When_Last_Login {
 
       $settings = get_option( 'wll_settings' );
 
-      $show = $settings['show_all_login_records'];
-
-      if( 1 === $show ) {
-        $show = true;
-      }else{
-        $show = false;
-      }
+      $show = (!empty($settings['show_all_login_records']) AND $settings['show_all_login_records'] === 1);
 
       $show_login_records = apply_filters( 'when_last_login_show_records_table', $show );
 
