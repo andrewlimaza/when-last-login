@@ -3,9 +3,9 @@ Contributors: andrewza, yoohooplugins, travislima
 Tags: last login, user login, user login time, last logged in, last seen, user last seen, WordPress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen, last login WordPress
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
 Requires at least: 4.0
-Tested up to: 5.2.1
+Tested up to: 5.3
 Requires PHP: 5.6
-Stable tag: trunk
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,11 @@ Add the following snippet of code to your theme's functions.php or custom plugin
 2. When Last Login - Show top 3 user login (includes 'administrators' in free version)
 
 == Changelog ==
+
+= 1.2 =
+* Security: Added nonces to settings page.
+* Enhancement: Moved notice from all dashboard pages to only show on dashboard page.
+* Enhancement: All login records functionality improvement to support PHP 7.4 - Thanks [@walle98](https://github.com/walle89)
 
 = 1.1 =
 * Enhancement: Support Privacy Changes coming to WordPress 4.9.6
