@@ -152,6 +152,9 @@ Add the following snippet of code to your theme's functions.php or custom plugin
 * First Release
 
 == Upgrade Notice ==
+= 1.2 =
+* Version 1.2 includes security improvements and minor code improvements.
+
 = 1.1 =
 * Please update When Last Login to ensure you are running the latest version which includes changes for GDPR compliances and WordPress 4.9.6
 
