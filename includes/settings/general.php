@@ -27,24 +27,29 @@
 		$old_records_message = __( 'Are you sure you want to remove all records older than 3 months?', 'when-last-login' );
 		$all_records_message = __( 'Are you sure you want to remove all login records?', 'when-last-login' );
 		$all_ip_message = __( 'Are you sure you want to remove all IP addresses?', 'when-last-login' );
+
+
+		$remove_records_nonce = wp_create_nonce( 'wll_remove_records_nonce' );
+		$remove_all_records_nonce = wp_create_nonce( 'wll_remove_all_records_nonce' );
+		$remove_ip_nonce = wp_create_nonce( 'wll_remove_ip_nonce' );
 	?>
 
 		<script>
 			function wll_remove_old_records(){
 				if( window.confirm('<?php echo $old_records_message; ?>')) {
-					window.location.href = "<?php echo admin_url( 'admin.php?page=when-last-login-settings&remove_wll_records=1' ); ?>";
+					window.location.href = "<?php echo add_query_arg( array( 'remove_wll_records' => '1', 'wll_remove_records_nonce' => $remove_records_nonce ), admin_url( 'admin.php?page=when-last-login-settings' ) ); ?>";
 				}
 			}
 
 			function wll_remove_all_records(){
 				if( window.confirm('<?php echo $all_records_message; ?>')) {
-					window.location.href = "<?php echo admin_url( 'admin.php?page=when-last-login-settings&remove_all_wll_records=1' ); ?>";
+					window.location.href = "<?php echo add_query_arg( array( 'remove_all_wll_records' => '1', 'wll_remove_all_records_nonce' => $remove_all_records_nonce ), admin_url( 'admin.php?page=when-last-login-settings' ) ); ?>";
 				}
 			}
 
 			function wll_remove_all_ips(){
 				if( window.confirm('<?php echo $all_ip_message; ?>')) {
-					window.location.href = "<?php echo admin_url( 'admin.php?page=when-last-login-settings&remove_wll_ip_addresses=1' ); ?>";
+					window.location.href = "<?php echo add_query_arg( array( 'remove_wll_ip_addresses' => '1', 'wll_remove_ip_nonce' => $remove_ip_nonce ), admin_url( 'admin.php?page=when-last-login-settings' ) ); ?>";
 				}
 			}
 	</script>
@@ -65,6 +70,7 @@
 	</tr>
 
 	<tr>
+		<input type="hidden" name="_nonce" value="<?php echo wp_create_nonce( 'wll_settings_nonce' ); ?>">
 	    <th><input type="submit" name="wll_save_settings"  class="button-primary" value="<?php _e('Save Settings', 'when-last-login'); ?>" /></th>
 	    <td></td>
 	</tr>

@@ -119,7 +119,7 @@ class When_Last_Login {
         delete_option( 'wll_notice_hide_2' );
 
         // update version number to 1.0
-       update_option( 'wll_current_version', 1.0 );
+       update_option( 'wll_current_version', 1.2 );
       }
     }
 
@@ -129,12 +129,11 @@ class When_Last_Login {
 
     public static function update_notice(){
 
-      if( get_option( 'wll_notice_hide' ) != '1' ){
+      if( get_option( 'wll_notice_hide' ) != '1' && ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'when-last-login-settings' ) ){
         ?>
         <div class="notice notice-success  wll-update-notice-newsletter is-dismissible" >
-        <h3><?php _e('When Last Login', 'when-last-login'); ?></h3>
-        <p><?php _e( 'Sign up for our newsletter to get the latest product news and promotions, plus get 20% off of your next add-on purchase!', 'when-last-login' ); ?> <?php printf( __('Browse through our add-ons %s', 'when-last-login'), '<a href="'.admin_url( '?page=when-last-login-settings&tab=add-ons' ) .'">'.__('here', 'when-last-login').'</a>' ); ?></p>
-        <p><input type='email' style='width: 250px;' name='wll_user_subscribe_to_newsletter' id='wll_user_subscribe_to_newsletter' value='<?php echo get_option('admin_email'); ?>' /><button class='button button-primary' id='wll_subscribe_user'><?php _e('Subscribe Me!', 'when-last-login'); ?></button></p>
+        <h3><?php _e('Thank you for using When Last Login', 'when-last-login'); ?></h3>
+        <p><?php  _e( sprintf( 'Please consider leaving an honest review for When Last Login by visiting %s', '<a href="'. esc_url( 'https://wordpress.org/support/plugin/when-last-login/reviews/#new-post' ) . '" target="_blank">this link</a>' ), 'when-last-login' ); ?></p>
         </div>
         <?php
       }
@@ -341,8 +340,7 @@ class When_Last_Login {
                     </tr>                      
                     <?php
 
-                    $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'ASC', 'or
-                    derby' => 'meta_value', 'number' => 3, 'blog_id' => $blog_id ) );
+                    $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'ASC', 'oderby' => 'meta_value', 'number' => 3, 'blog_id' => $blog_id ) );
 
                     $topusers = $user_query->get_results();
 
@@ -392,7 +390,7 @@ class When_Last_Login {
 
             <?php
 
-            $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'ASC', 'orderby' => 'meta_value', 'number' => 3 ) );
+            $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'ASC', 'oderby' => 'meta_value', 'number' => 3 ) );
 
             $topusers = $user_query->get_results();
 
@@ -553,15 +551,20 @@ class When_Last_Login {
 
       if( isset( $_POST['wll_save_settings'] ) ){
 
-        $wll_settings['user_access'] = isset( $_POST['wll_login_record_user_access'] ) ? $_POST['wll_login_record_user_access'] : "";
-        $wll_settings['record_ip_address'] = isset( $_POST['wll_record_user_ip_address'] ) && $_POST['wll_record_user_ip_address'] == '1'  ? 1 : 0;
-        $wll_settings['show_all_login_records'] = isset( $_POST['wll_all_login_records'] ) && $_POST['wll_all_login_records'] == '1'  ? 1 : 0;
+        if( wp_verify_nonce( $_POST['_nonce'], 'wll_settings_nonce' ) ) {
 
-        $wll_settings = apply_filters( 'wll_settings_filter', $wll_settings );
+          $wll_settings['user_access'] = isset( $_POST['wll_login_record_user_access'] ) ? $_POST['wll_login_record_user_access'] : "";
+          $wll_settings['record_ip_address'] = isset( $_POST['wll_record_user_ip_address'] ) && $_POST['wll_record_user_ip_address'] == '1'  ? 1 : 0;
+          $wll_settings['show_all_login_records'] = isset( $_POST['wll_all_login_records'] ) && $_POST['wll_all_login_records'] == '1'  ? 1 : 0;
 
-        if ( update_option( 'wll_settings', $wll_settings ) ) {
-          //show admin notice here.
-          add_action( 'admin_notices', array( $this, 'wll_admin_notices' ) );
+          $wll_settings = apply_filters( 'wll_settings_filter', $wll_settings );
+
+          if ( update_option( 'wll_settings', $wll_settings ) ) {
+            //show admin notice here.
+            add_action( 'admin_notices', array( $this, 'wll_admin_notices' ) );
+          }
+        } else {
+          die( 'nonce not valid' );
         }
 
       }
@@ -609,36 +612,54 @@ class When_Last_Login {
         $sql = "DELETE p, pm FROM $wpdb->posts p LEFT JOIN $wpdb->postmeta pm ON pm.post_id = p.ID WHERE p.post_type = 'wll_records'";
 
         if ( isset( $_REQUEST['remove_all_wll_records'] ) ) {
-          if ( $wpdb->query( $sql ) > 0 ) {
-            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
-          } else {
-            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
-          } 
 
+          $nonce = $_REQUEST['wll_remove_all_records_nonce'];
+          if ( wp_verify_nonce( $nonce, 'wll_remove_all_records_nonce' ) ) {
+
+            if ( $wpdb->query( $sql ) > 0 ) {
+              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+            } else {
+              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+            }
+          } else {
+            die( 'nonce not valid.' );
+          }
         }
 
         if ( isset( $_REQUEST['remove_wll_records'] ) ) {
 
-          $date = apply_filters( 'wll_automatically_remove_logs_date', date( 'Y-m-d', strtotime( '-3 months' ) ) );
+          $nonce = $_REQUEST['wll_remove_records_nonce'];
+          if ( wp_verify_nonce( $nonce, 'wll_remove_records_nonce' ) ) {
 
-          $sql .= " AND p.post_date <= '$date'";
+            $date = apply_filters( 'wll_automatically_remove_logs_date', date( 'Y-m-d', strtotime( '-3 months' ) ) );
 
-          if ( $wpdb->query( $sql ) > 0 ) {
-            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+            $sql .= " AND p.post_date <= '$date'";
+
+            if ( $wpdb->query( $sql ) > 0 ) {
+              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+            } else {
+              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+            }
           } else {
-            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+            die( 'nonce not valid.' );
           } 
         }
 
         if ( isset( $_REQUEST['remove_wll_ip_addresses'] ) ) {
-          $sql = "DELETE FROM $wpdb->usermeta WHERE meta_key = 'wll_user_ip_address'";
 
-          if ( $wpdb->query( $sql ) > 0 ) {
-            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+          $nonce = $_REQUEST['wll_remove_ip_nonce'];
+          if ( wp_verify_nonce( $nonce, 'wll_remove_ip_nonce' ) ) {
+
+            $sql = "DELETE FROM $wpdb->usermeta WHERE meta_key = 'wll_user_ip_address'";
+
+            if ( $wpdb->query( $sql ) > 0 ) {
+              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+            } else {
+              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+            }
           } else {
-            add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
-          } 
-
+            die( 'nonce not valid.' );
+          }
         }
     }
 

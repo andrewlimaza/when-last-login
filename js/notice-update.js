@@ -12,14 +12,12 @@ jQuery(document).on( 'click', '.wll-update-notice-newsletter .notice-dismiss', f
 jQuery(document).on( 'click', '#wll_subscribe_user', function(){
 
 	var email_address = jQuery("#wll_user_subscribe_to_newsletter").val();
-
 	var data = {
         action: 'wll_subscribe_user_newsletter',
         email: email_address
 	}
 
 	jQuery.post( ajaxurl, data, function( response ){
-		
 		if( response ){
 			jQuery("#wll_user_subscribe_to_newsletter").attr( 'disabled', 'true');
 			jQuery("#wll_subscribe_user").attr( 'disabled', 'true');

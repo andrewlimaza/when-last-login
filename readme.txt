@@ -3,9 +3,9 @@ Contributors: andrewza, yoohooplugins, travislima
 Tags: last login, user login, user login time, last logged in, last seen, user last seen, WordPress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen, last login WordPress
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
 Requires at least: 4.0
-Tested up to: 4.9
+Tested up to: 5.2.1
 Requires PHP: 5.6
-Stable tag: 1.0
+Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -167,3 +167,5 @@ Add the following snippet of code to your theme's functions.php or custom plugin
 
 = 0.1 =
 * First Release
+
+
