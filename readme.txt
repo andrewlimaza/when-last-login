@@ -1,11 +1,11 @@
 === When Last Login ===
-Contributors: andrewza, yoohooplugins, travislima
+Contributors: andrewza, yoohooplugins, travislima, d-skinner
 Tags: last login, user login, user login time, last logged in, last seen, user last seen, WordPress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen, last login WordPress
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
 Requires at least: 4.0
 Tested up to: 5.3
 Requires PHP: 5.6
-Stable tag: 1.1
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,10 +19,10 @@ A lightweight plugin that allows you to see active users according to their last
 * Sorts users according to last login time stamp (Ascending/Descending) in the WordPress user list.
 * Administrator widget for top 3 users according to login count.
 * Integrates with Paid Memberships Pro  1.8+ - Add's a 'Last Logged In' column to the 'Members List'.
-* Generates a login history table under 'When Last Login' > 'All Login Records'. 
+* Generates a login history table under 'When Last Login' > 'All Login Records'.
 * Hooks and filters for developers.
 * Record the user's last IP address when logging into your WordPress website (Optional Setting).
-* A variety of [Premium](https://yoohooplugins.com/plugins/?utm_source=plugin&utm_medium=wordpress&utm_campaign=premium_addons) and Free add-ons available. 
+* A variety of [Premium](https://yoohooplugins.com/plugins/?utm_source=plugin&utm_medium=wordpress&utm_campaign=premium_addons) and Free add-ons available.
 
 = Free Add-ons =
 * [When Last Login - Welcome Email](https://wordpress.org/plugins/when-last-login-welcome-email-add-on/)
@@ -59,7 +59,7 @@ Something not working as intended or have a question about functionality of When
 == Frequently Asked Questions ==
 
 = What does When Last Login do exactly? =
-When Last Login allows you to see when last users have logged into your WordPress website. This is great for big sites that require user management. 
+When Last Login allows you to see when last users have logged into your WordPress website. This is great for big sites that require user management.
 
 = Is When Last Login GDPR ready? =
 Since version 1.0, we have made it easier to be GDPR compliant. With this being said, you need to take the necessary steps in order to become GDPR compliant - we are not a law firm!
@@ -77,8 +77,8 @@ Inside your WordPress dashboard, navigate to 'When Last Login' -> 'Settings'. Un
 This is because users have not logged in since you have activated "When Last Login". By default we set the "Last Login" to "Never" but this can be easily changed. Once a user logs into your site, their profile will be updated from "Never" to a timestamp.
 
 = I have updated and lost my 'Login Records' link in the WordPress dashboard =
-As of version 0.6 the 'Login Records' has been moved under the 'Users' link in the admin dashboard. 
-Version 0.7 introduced a settings page menu item. The 'Login Records' can now be found under the 'When Last Login' menu item. 
+As of version 0.6 the 'Login Records' has been moved under the 'Users' link in the admin dashboard.
+Version 0.7 introduced a settings page menu item. The 'Login Records' can now be found under the 'When Last Login' menu item.
 
 = How can I hide the 'All Login Records'? =
 Inside your WordPress dashboard navigate to 'When Last Login' -> 'Settings' and deselect this option.
@@ -92,6 +92,9 @@ Add the following snippet of code to your theme's functions.php or custom plugin
 2. When Last Login - Show top 3 user login (includes 'administrators' in free version)
 
 == Changelog ==
+
+= 1.2.1 =
+* Moved to the "Settings" option page.
 
 = 1.2 =
 * Security: Added nonces to settings page.
@@ -133,7 +136,7 @@ Add the following snippet of code to your theme's functions.php or custom plugin
 * Filter: 'when_last_login_show_admin_widget'. Accepts boolean (default: true).
 
 = 0.5 =
-* Enhancement: Ability to see which users have logged in and at what times ( Custom Post Type ) - @jarrydlong 
+* Enhancement: Ability to see which users have logged in and at what times ( Custom Post Type ) - @jarrydlong
 * Bug Fix: return default value for column data if no data is found - @seagyn
 * Enhancement: Improved code readability
 
@@ -175,5 +178,3 @@ Add the following snippet of code to your theme's functions.php or custom plugin
 
 = 0.1 =
 * First Release
-
-
