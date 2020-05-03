@@ -20,7 +20,7 @@ class When_Last_Login {
     /**
     * Initializes the plugin by setting localization, filters, and administration functions.
     */
-    private function __construct() {        
+    private function __construct() {
 
       define( 'WLL_BASENAME', plugin_basename( __FILE__ ) );
       define( 'WLL_DIR_PATH', plugin_dir_path( __FILE__ ) );
@@ -40,7 +40,7 @@ class When_Last_Login {
       add_action( 'user_register', array( $this, 'wll_user_register' ), 10, 1 );
 
       //Admin actions
-      add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );      
+      add_action( 'wp_dashboard_setup', array( $this, 'admin_dashboard_widget' ) );
       add_action( 'admin_notices', array( $this, 'update_notice' ) );
 
       add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_hide_subscription_notice' ) );
@@ -224,7 +224,7 @@ class When_Last_Login {
           if ( ! empty( $post_id ) ) {
             update_post_meta( $post_id, 'wll_user_ip_address', $ip );
           }
-          
+
             update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
         }
 
@@ -237,7 +237,7 @@ class When_Last_Login {
         $wll_settings = get_option( 'wll_settings' );
 
         if( isset( $wll_settings['record_ip_address'] ) && $wll_settings['record_ip_address'] == 1 ){
-          
+
         $ip = When_Last_Login::wll_get_user_ip_address();
         update_user_meta( $user_id, 'wll_user_ip_address', $ip );
 
@@ -326,18 +326,18 @@ class When_Last_Login {
         if( is_network_admin() ){
 
             $sites = get_sites();
-                        
+
             if( is_array( $sites ) ){
-            
+
                 foreach( $sites as $site ){
-                
+
                     $blog_id = $site->blog_id;
                     $blog_details = get_blog_details( $blog_id );
-                
-                    ?><table width="100%" text-align="center" class='wp-list-table striped widefat'>          
+
+                    ?><table width="100%" text-align="center" class='wp-list-table striped widefat'>
                     <tr>
                         <th colspan='4' style='text-align: center;'><strong><?php echo $blog_details->blogname .' (<a href="'.$blog_details->siteurl.'" target="_BLANK">'.$blog_details->siteurl.')</a>'; ?></strong></th>
-                    </tr>                      
+                    </tr>
                     <?php
 
                     $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'ASC', 'oderby' => 'meta_value', 'number' => 3, 'blog_id' => $blog_id ) );
@@ -351,11 +351,11 @@ class When_Last_Login {
                             <th><strong><?php _e( 'Users', 'when-last-login' ); ?></strong></th>
                             <th><strong><?php _e( 'Login Count', 'when-last-login' ); ?></strong></th>
                             <th><strong><?php _e( 'Last Logged In', 'when-last-login' ); ?></strong></th>
-                        </tr> 
+                        </tr>
                     <?php
-                        
+
                         $count = 1;
-                        
+
                         foreach($topusers as $wllusers){
                             echo '<tr><td>' . $count . '</td>';
                             echo '<td>' . $wllusers->display_name . '</td>';
@@ -363,30 +363,30 @@ class When_Last_Login {
                             echo '<td>' . date( 'Y-m-d H:i:s', get_user_meta( $wllusers->ID, 'when_last_login', true ) ) . '</td></tr>';
                             $count++;
                         }
-                      
+
                     } else {
 
                         echo '<tr><td colspan="4">'.__('No data yet', 'when-last-login').'</td></tr>';
-            
+
                     }
 
                     ?></table><br/><?php
 
                 }
-             
+
                 ?>
 
                 <a href="<?php echo admin_url( 'users.php?orderby=when_last_login&order=desc' ); ?>"><?php _e( 'View All Users', 'when-last-login' ); ?></a>
 
                 <?php if( $show_login_records == true ){ ?>
                     <a style="float:right" href="<?php echo admin_url( 'edit.php?post_type=wll_records' ); ?>"><?php _e( 'View Login Records', 'when-last-login' ); } //end the if filter check here ?></a>
-                <?php                
-                    
+                <?php
+
             }
-        
+
         } else {
 
-            ?><table width="100%" text-align="center" class='wp-list-table striped widefat'>          
+            ?><table width="100%" text-align="center" class='wp-list-table striped widefat'>
 
             <?php
 
@@ -401,11 +401,11 @@ class When_Last_Login {
                     <th><strong><?php _e( 'Users', 'when-last-login' ); ?></strong></th>
                     <th><strong><?php _e( 'Login Count', 'when-last-login' ); ?></strong></th>
                     <th><strong><?php _e( 'Last Logged In', 'when-last-login' ); ?></strong></th>
-                </tr> 
+                </tr>
             <?php
-                
+
                 $count = 1;
-                
+
                 foreach($topusers as $wllusers){
                     echo '<tr><td>' . $count . '</td>';
                     echo '<td>' . $wllusers->display_name . '</td>';
@@ -413,11 +413,11 @@ class When_Last_Login {
                     echo '<td>' . date( 'Y-m-d H:i:s', get_user_meta( $wllusers->ID, 'when_last_login', true ) ) . '</td></tr>';
                     $count++;
                 }
-              
+
             } else {
 
                 echo '<tr><td colspan="4">'.__('No data yet', 'when-last-login').'</td></tr>';
-    
+
             }
 
             ?></table><br/><?php
@@ -428,7 +428,7 @@ class When_Last_Login {
 
         <?php if( $show_login_records == true ){ ?>
             <a style="float:right" href="<?php echo admin_url( 'edit.php?post_type=wll_records' ); ?>"><?php _e( 'View Login Records', 'when-last-login' ); } //end the if filter check here ?></a>
-        <?php    
+        <?php
 
         }
 
@@ -445,7 +445,7 @@ class When_Last_Login {
       if ( ! empty( $settings['record_ip_address'] ) ) {
         $column['when_last_login_ip_address'] = __( 'IP Address', 'when-last-login' );
       }
-      
+
 
        return $column;
      }
@@ -529,11 +529,13 @@ class When_Last_Login {
 
     public function wll_settings_page(){
 
-      add_menu_page( __('When Last Login', 'when-last-login'), __('When Last Login', 'when-last-login'), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ), 'dashicons-visibility');
-
-      add_submenu_page( 'when-last-login-settings', __('Settings', 'when-last-login'), __('Settings', 'when-last-login'), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
-
-      add_submenu_page( 'when-last-login-settings', __('Extensions', 'when-last-login'), __('Extensions', 'when-last-login'), 'manage_options', 'admin.php?page=when-last-login-settings&tab=add-ons' );
+      add_options_page(
+        'Settings Admin',
+        __('When Last Login', 'when-last-login'),
+        'manage_options',
+        'when-last-login-settings',
+        array( $this, 'wll_settings_callback' )
+      );
       
       do_action( 'wll_settings_admin_menu_item' );
 
@@ -608,7 +610,7 @@ class When_Last_Login {
         }
 
         global $wpdb;
-      
+
         $sql = "DELETE p, pm FROM $wpdb->posts p LEFT JOIN $wpdb->postmeta pm ON pm.post_id = p.ID WHERE p.post_type = 'wll_records'";
 
         if ( isset( $_REQUEST['remove_all_wll_records'] ) ) {
@@ -642,7 +644,7 @@ class When_Last_Login {
             }
           } else {
             die( 'nonce not valid.' );
-          } 
+          }
         }
 
         if ( isset( $_REQUEST['remove_wll_ip_addresses'] ) ) {
@@ -720,7 +722,7 @@ class When_Last_Login {
       }
 
       $ip = apply_filters( 'wll_user_ip_address', $ip );
-      
+
       return IpAnonymizer::anonymizeIp( $ip );
     }
 
