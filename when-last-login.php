@@ -726,3 +726,10 @@ class When_Last_Login {
 
 } // end class
 When_Last_Login::get_instance();
+
+//rigistering stylesheet
+wp_register_style('admin_dash', plugins_url('/css/admin.css', __FILE__));
+    
+        
+    //implementing the registerd css in the page
+    wp_enqueue_style('admin_dash');
