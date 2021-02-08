@@ -436,7 +436,7 @@ class When_Last_Login {
         if ( ! defined( 'WLL_STATS_VERSION' ) && apply_filters( 'wll_show_top_users_cta', true ) ) {
          ?>
           <br/><br/>
-          <span class='wll-user-stats-cta description' style="margin:0 auto;text-align:center;display:block;font-style:italic"><?php _e( sprintf( 'Optional: Get more advanced statistics with the %s.', '<a href="' . esc_url( 'https://yoohooplugins.com/plugins/when-last-login-user-statistics/?utm_source=plugin&utm_medium=WLL&utm_campaign=user_statistics') . '" target="_blank">' . __( 'User Statistics Add On', 'when-last-login' ). '</a>' ), 'when-last-login' ); ?></span>
+          <span class='wll-user-stats-cta description' style="margin:0 auto;text-align:center;display:block;font-style:italic"><?php _e( sprintf( 'Optional: Get advanced statistics with the %s.', '<a href="' . esc_url( 'https://yoohooplugins.com/plugins/when-last-login-user-statistics/?utm_source=plugin&utm_medium=WLL&utm_campaign=user_statistics') . '" target="_blank">' . __( 'User Statistics Add On', 'when-last-login' ). '</a>' ), 'when-last-login' ); ?></span>
          <?php
         }
 
