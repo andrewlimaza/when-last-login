@@ -58,8 +58,7 @@ class When_Last_Login {
       //Integration for Paid Memberships Pro
       //TODO: Improve integration with Member List and Paid Memberships Pro
       add_action( 'pmpro_memberslist_extra_cols_header', array( $this, 'pmpro_memberlist_add_header' ) );
-      add_action( 'pmpro_memberslist_extra_cols_body', array( $this, 'pmpro_memberlist_add_column_data' ) );
-      add_action( 'admin_menu', array( $this, 'login_record_cp' ) );
+      add_action( 'pmpro_memberslist_extra_cols_body', array( $this, 'pmpro_memberlist_add_column_data' ) );      
 
       add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
       add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
@@ -285,7 +284,7 @@ class When_Last_Login {
       if( get_option( 'wll_notice_hide' ) != '1' && ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'when-last-login-settings' ) ){
         ?>
         <div class="notice notice-success  wll-update-notice-newsletter is-dismissible" >
-        <h3><?php esc_html('Thank you for using When Last Login', 'when-last-login'); ?></h3>
+        <h3><?php echo esc_html('Thank you for using When Last Login', 'when-last-login'); ?></h3>
         <p><?php  _e( sprintf( 'Please consider leaving an honest review for When Last Login by visiting %s', '<a href="'. esc_url( 'https://wordpress.org/support/plugin/when-last-login/reviews/#new-post' ) . '" target="_blank">this link</a>' ), 'when-last-login' ); ?></p>
         </div>
         <?php
@@ -358,7 +357,12 @@ class When_Last_Login {
 
          update_user_meta($users->ID, 'when_last_login_count', $wll_new_value);
        }
-       
+       $settings = get_option( 'wll_settings' );
+
+      $show = ( ! empty($settings['show_all_login_records']) && intval( $settings['show_all_login_records'] ) === 1);
+
+      $show_login_records = apply_filters( 'when_last_login_show_records_table', $show );
+     
        if( $show_login_records == true ){
        
         $post_id = $this->record_login( $users->data->display_name . __( ' has logged in at ', 'when-last-login' ) . date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ), $users->ID, 'publish', date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ) );
@@ -396,22 +400,6 @@ class When_Last_Login {
 
         do_action( 'wll_register_action', $user_id, $wll_settings );
 
-     }
-
-    public static function login_record_cp(){
-
-      global $show_login_records;
-
-      $settings = get_option( 'wll_settings' );
-
-      $show = ( ! empty($settings['show_all_login_records']) AND intval( $settings['show_all_login_records'] ) === 1);
-
-      $show_login_records = apply_filters( 'when_last_login_show_records_table', $show );
-
-      if( $show_login_records ){
-        add_submenu_page( 'when-last-login-settings', __('All Login Records', 'when-last-login'), __('All Login Records', 'when-last-login'), 'manage_options', 'all-login-records', array( $this, 'all_login_records_content' ) );
-      }
-       
      }
 
      public function all_login_records_content(){
@@ -653,8 +641,23 @@ class When_Last_Login {
      }
 
     public function wll_settings_page(){
+  
+     global $show_login_records;
 
-      add_submenu_page( 'options-general.php', __( 'When Last Login', 'when-last-login' ), __( 'When Last Login', 'when-last-login' ), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+      $settings = get_option( 'wll_settings' );
+
+      $show = ( ! empty($settings['show_all_login_records']) && intval( $settings['show_all_login_records'] ) === 1);
+
+      $show_login_records = apply_filters( 'when_last_login_show_records_table', $show );
+
+      if( $show_login_records ){
+      add_menu_page( __( 'When Last Login', 'when-last-login' ), __( 'When Last Login', 'when-last-login' ), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+      add_submenu_page( 'when-last-login-settings', __('All Login Records', 'when-last-login'), __('All Login Records', 'when-last-login'), 'manage_options', 'all-login-records', array( $this, 'all_login_records_content' ) );
+      add_submenu_page( 'when-last-login-settings', __('Add Ons', 'when-last-login'), __('Add Ons', 'when-last-login'), 'manage_options', 'admin.php?page=when-last-login-settings&tab=add-ons' );
+    } else {
+       add_submenu_page( 'options-general.php', __( 'When Last Login', 'when-last-login' ), __( 'When Last Login', 'when-last-login' ), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+    }
+     
       
       do_action( 'wll_settings_admin_menu_item' );
 
