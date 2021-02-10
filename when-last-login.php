@@ -132,7 +132,7 @@ class When_Last_Login {
             update_option( 'wll_current_version', 1.2 );
         }
 
-        if( $current_version > 1.2 ){
+        if( $current_version == 1.2 ){
 
             $this->create_records_table();
             $this->migrate_records();
