@@ -3,7 +3,7 @@
 Plugin Name: When Last Login
 Plugin URI: https://wordpress.org/plugins/when-last-login/
 Description: See when a user logs into your WordPress site.
-Version: 1.2
+Version: 2.0
 Author: Yoohoo Plugins
 Author URI: https://yoohooplugins.com
 Text Domain: when-last-login
@@ -25,7 +25,7 @@ class When_Last_Login {
       define( 'WLL_BASENAME', plugin_basename( __FILE__ ) );
       define( 'WLL_DIR_PATH', plugin_dir_path( __FILE__ ) );
       define( 'WLL_PLUGIN', WP_PLUGIN_URL . '/when-last-login' );
-      define( 'WLL_VERSION', '1.2' );
+      define( 'WLL_VERSION', '2.0' );
 
       $settings = get_option( 'wll_settings' );
 
@@ -47,6 +47,7 @@ class When_Last_Login {
       add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_hide_subscription_notice' ) );
       add_action( 'wp_ajax_wll_subscribe_user_newsletter', array( $this, 'wll_subscribe_user_newsletter_callback' ) );
 
+      register_activation_hook( __FILE__, array( $this, 'activation' ) );
 
       //Setting up columns.
       add_filter( 'manage_users_columns', array( $this, 'column_header'), 10, 1 );
@@ -57,8 +58,7 @@ class When_Last_Login {
       //Integration for Paid Memberships Pro
       //TODO: Improve integration with Member List and Paid Memberships Pro
       add_action( 'pmpro_memberslist_extra_cols_header', array( $this, 'pmpro_memberlist_add_header' ) );
-      add_action( 'pmpro_memberslist_extra_cols_body', array( $this, 'pmpro_memberlist_add_column_data' ) );
-      add_action( 'init', array( $this, 'login_record_cp' ) );
+      add_action( 'pmpro_memberslist_extra_cols_body', array( $this, 'pmpro_memberlist_add_column_data' ) );      
 
       add_action( 'admin_menu', array( $this, 'wll_settings_page' ), 9 );
       add_action( 'admin_head', array( $this, 'wll_settings_page_head' ) );
@@ -79,6 +79,15 @@ class When_Last_Login {
     }
 
     /**
+     * Acivatation Hook
+     */
+    public function activation(){
+
+        $this->create_records_table();
+
+    }
+
+    /**
     * Creates or returns an instance of this class.
     *
     * @return  When_Last_Login A single instance of this class.
@@ -94,34 +103,176 @@ class When_Last_Login {
     * When Last plugin functions.
     */
     public static function admin_init(){
-    //init function
-      if ( ! current_user_can( 'manage_options' ) ) {
-        return;
-      }
+        //init function
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
 
-      do_action( 'wll_upgrade_check' );
+        do_action( 'wll_upgrade_check' );
 
-      $current_version = floatval( get_option( 'wll_current_version' ) );
+        $current_version = floatval( get_option( 'wll_current_version' ) );
 
-      // Clean up stuff for version 1.0
-      if( $current_version < 1.0 || empty( $current_version ) ) {
+        // Clean up stuff for version 1.0
+        if( $current_version < 1.0 || empty( $current_version ) ) {
+
+            global $wpdb;
+
+            $delete_table = $wpdb->prefix . 'wll_login_attempts' ;
+            $sql = "DROP TABLE IF EXISTS `$delete_table`";
+            $wpdb->query( $sql );
+
+            delete_transient( 'when_last_login_add_ons_page' );
+
+            // on upgrade remove the notice save.
+            delete_option( 'wll_notice_hide' );
+            delete_option( 'wll_notice_hide_1' );
+            delete_option( 'wll_notice_hide_2' );
+
+            // update version number to 1.0
+            update_option( 'wll_current_version', 1.2 );
+        }
+
+        if( $current_version == 1.2 ){
+
+            $this->create_records_table();
+            $this->migrate_records();
+
+            update_option( 'wll_current_version', 2.0 );
+        }
+    }
+
+    function create_records_table(){
 
         global $wpdb;
 
-        $delete_table = $wpdb->prefix . 'wll_login_attempts' ;
-        $sql = "DROP TABLE IF EXISTS `$delete_table`";
-        $wpdb->query( $sql );
+        $records = $wpdb->prefix.'wll_login_records';
 
-        delete_transient( 'when_last_login_add_ons_page' );
+        $sql = "CREATE TABLE ".$records." ( `id` INT(11) NOT NULL AUTO_INCREMENT , `title` VARCHAR(255) NOT NULL , `author` INT(11) NOT NULL , `status` VARCHAR(255) NOT NULL , `date` VARCHAR(255) NOT NULL , `ip` VARCHAR(255) NOT NULL , PRIMARY KEY (`id`)) ENGINE = MyISAM";
 
-        // on upgrade remove the notice save.
-        delete_option( 'wll_notice_hide' );
-        delete_option( 'wll_notice_hide_1' );
-        delete_option( 'wll_notice_hide_2' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta( $sql );
 
-        // update version number to 1.0
-       update_option( 'wll_current_version', 1.2 );
+    }
+
+    function migrate_records(){
+
+        $args = array(
+            'post_type' => 'wll_records',
+            'posts_per_page' => -1,
+        );
+
+        $the_query = new WP_Query( $args );
+
+        if( $the_query->have_posts() ){
+          while( $the_query->have_posts() ){
+            $the_query->the_post();
+
+            $recorded = $this->record_login( get_the_title(), get_the_author(), 'publish', get_the_date() );
+
+            $stored_ip = get_post_meta( get_the_ID(), 'wll_user_ip_address', true );
+
+            if( $stored_id !== "" ){
+              $this->record_ip( $recorded, $stored_ip );
+            }
+
+          }
+        }
+
+    }
+
+    function record_login( $title, $author, $status, $date ){
+
+        global $wpdb;        
+
+        $wpdb->insert(
+            $wpdb->prefix.'wll_login_records',
+            array(
+                'title'     => $title,
+                'author'    => $author,
+                'status'    => $status,
+                'date'      => $date
+            ),
+            array(
+                '%s',
+                '%d',
+                '%s',
+                '%s',
+            )
+        );
+
+        return $wpdb->insert_id;
+
+    }
+
+    function record_ip( $id, $ip ){
+
+        global $wpdb;
+
+        return $wpdb->update( 
+            $wpdb->prefix.'wll_login_records',
+            array( 'ip' => $ip ),
+            array( 'id' => $id ),
+            array( '%s' ),
+            array( '%s' )
+        );
+
+    }
+
+    function get_records( $page = 1, $id = 0 ){
+
+      global $wpdb;
+
+      $table_name = $wpdb->prefix.'wll_login_records';
+
+      $sql = "SELECT * FROM $table_name ";
+
+      if( $page >= 1 && $id == 0 ){
+
+        $offset = ( $page - 1 ) * 25;
+
+        $sql .= "ORDER BY `id` DESC LIMIT ".$offset.",25";
+        
+        return $wpdb->get_results( $sql );
       }
+
+      if( $id > 0 ){
+        $sql .= "WHERE `id` = '".$id."'";
+
+        return $wpdb->get_row( $sql );
+      }
+
+    }
+
+    function count_records(){
+
+      global $wpdb;
+
+      $table_name = $wpdb->prefix.'wll_login_records';
+
+      return $wpdb->get_var("SELECT count( * ) FROM $table_name" );
+
+    }
+
+    function build_pagination(){
+
+      $records = $this->count_records();
+
+      $pages = ceil( $records / 25 );
+
+      echo $records.__(' Records', 'when-last-login' ).' | '.__('Page ', 'when-last-login');
+
+      for( $i = 1; $i <= $pages; $i++ ){
+        echo "<a href='".admin_url( 'admin.php?page=all-login-records&wll_record_page='.$i )."'>".$i."</a> ";
+      }
+      
+    }
+
+    function delete_record( $id ){
+
+      global $wpdb;
+
+      $deleted = $wpdb->delete( $wpdb->prefix.'wll_login_records', array( 'id' => $id ) );
+
     }
 
     public static function text_domain(){
@@ -133,7 +284,7 @@ class When_Last_Login {
       if( get_option( 'wll_notice_hide' ) != '1' && ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'when-last-login-settings' ) ){
         ?>
         <div class="notice notice-success  wll-update-notice-newsletter is-dismissible" >
-        <h3><?php esc_html('Thank you for using When Last Login', 'when-last-login'); ?></h3>
+        <h3><?php echo esc_html('Thank you for using When Last Login', 'when-last-login'); ?></h3>
         <p><?php  _e( sprintf( 'Please consider leaving an honest review for When Last Login by visiting %s', '<a href="'. esc_url( 'https://wordpress.org/support/plugin/when-last-login/reviews/#new-post' ) . '" target="_blank">this link</a>' ), 'when-last-login' ); ?></p>
         </div>
         <?php
@@ -183,6 +334,9 @@ class When_Last_Login {
       if( isset( $_GET['page'] ) && sanitize_text_field( $_GET['page'] ) == 'when-last-login-settings' ){
         wp_enqueue_style( 'wll_admin_settings_styles', plugins_url( '/css/admin.css', __FILE__ ) );
       }
+      if( isset( $_GET['page'] ) && $_GET['page'] == 'all-login-records' ){
+        wp_enqueue_script( 'wll_admin_login_records_script', plugins_url( '/js/admin.js', __FILE__ ) );
+      }
     }
 
      public static function last_login( $user_login, $users ){
@@ -203,16 +357,16 @@ class When_Last_Login {
 
          update_user_meta($users->ID, 'when_last_login_count', $wll_new_value);
        }
+       $settings = get_option( 'wll_settings' );
+
+      $show = ( ! empty($settings['show_all_login_records']) && intval( $settings['show_all_login_records'] ) === 1);
+
+      $show_login_records = apply_filters( 'when_last_login_show_records_table', $show );
+     
        if( $show_login_records == true ){
-       $args = array(
-          'post_title'    => $users->data->display_name . __( ' has logged in at ', 'when-last-login' ) . date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ),
-          'post_status'   => 'publish',
-          'post_author'   => $users->ID,
-          'post_type'     => 'wll_records'
-        );
-
-        $post_id = wp_insert_post( $args );
-
+       
+        $post_id = $this->record_login( $users->data->display_name . __( ' has logged in at ', 'when-last-login' ) . date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ), $users->ID, 'publish', date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ) );
+       
       }
 
         $wll_settings = get_option( 'wll_settings' );
@@ -223,7 +377,7 @@ class When_Last_Login {
           $ip = When_Last_Login::wll_get_user_ip_address();
 
           if ( ! empty( $post_id ) ) {
-            update_post_meta( $post_id, 'wll_user_ip_address', $ip );
+            $this->record_ip( $post_id, $ip );
           }
           
             update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
@@ -248,58 +402,10 @@ class When_Last_Login {
 
      }
 
-     public static function login_record_cp(){
+     public function all_login_records_content(){
 
-      global $show_login_records;
-
-      $settings = get_option( 'wll_settings' );
-
-      $show = ( ! empty($settings['show_all_login_records']) AND intval( $settings['show_all_login_records'] ) === 1);
-
-      $show_login_records = apply_filters( 'when_last_login_show_records_table', $show );
-
-      if( $show_login_records != true ){
-        return;
-      }
-
-       $labels = array(
-         'name'               => __( 'Login Records', 'when-last-login' ),
-         'singular_name'      => __( 'Login Record', 'when-last-login' ),
-         'menu_name'          => __( 'Login Records', 'when-last-login' ),
-         'name_admin_bar'     => __( 'Login Record', 'when-last-login' ),
-         'add_new'            => __( 'Add New', 'when-last-login' ),
-         'add_new_item'       => __( 'Add New Login Record', 'when-last-login' ),
-         'new_item'           => __( 'New Login Record', 'when-last-login' ),
-         'edit_item'          => __( 'Edit Login Record', 'when-last-login' ),
-         'view_item'          => __( 'View Login Record', 'when-last-login' ),
-         'all_items'          => __( 'All Login Records', 'when-last-login' ),
-         'search_items'       => __( 'Search Login Records', 'when-last-login' ),
-         'parent_item_colon'  => __( 'Parent Login Records:', 'when-last-login' ),
-         'not_found'          => __( 'No login records found.', 'when-last-login' ),
-         'not_found_in_trash' => __( 'No login records found in Trash.', 'when-last-login' )
-       );
-
-       $args = array(
-         'labels'             => $labels,
-         'description'        => __( 'Description.', 'when-last-login' ),
-         'public'             => false,
-         'publicly_queryable' => false,
-         'show_ui'            => true,
-         'show_in_menu'       => 'users.php',
-         'query_var'          => true,
-         'rewrite'            => array( 'slug' => 'when-last-login-records' ),
-         'capability_type'    => 'post',
-         'has_archive'        => true,
-         'hierarchical'       => false,
-         'menu_position'      => null,
-         'supports'           => array( 'title', 'author' ),
-         'capabilities' => array(
-           'create_posts' => false,
-         ),
-         'map_meta_cap' => true,
-       );
-
-       register_post_type( 'wll_records', $args );
+        include plugin_dir_path( __FILE__ ).'includes/settings/records.php';
+       
      }
 
      /**
@@ -511,9 +617,10 @@ class When_Last_Login {
        if( !defined( 'PMPRO_VERSION' ) ){
          return;
        }
-?>
+      ?>
       <th><?php esc_html_e( 'Last Login', 'when-last-login' );?></th>
-<?php
+      <?php
+
      }
 
      public static function pmpro_memberlist_add_column_data( $users ){
@@ -534,8 +641,23 @@ class When_Last_Login {
      }
 
     public function wll_settings_page(){
+  
+     global $show_login_records;
 
-      add_submenu_page( 'options-general.php', __( 'When Last Login', 'when-last-login' ), __( 'When Last Login', 'when-last-login' ), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+      $settings = get_option( 'wll_settings' );
+
+      $show = ( ! empty($settings['show_all_login_records']) && intval( $settings['show_all_login_records'] ) === 1);
+
+      $show_login_records = apply_filters( 'when_last_login_show_records_table', $show );
+
+      if( $show_login_records ){
+      add_menu_page( __( 'When Last Login', 'when-last-login' ), __( 'When Last Login', 'when-last-login' ), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+      add_submenu_page( 'when-last-login-settings', __('All Login Records', 'when-last-login'), __('All Login Records', 'when-last-login'), 'manage_options', 'all-login-records', array( $this, 'all_login_records_content' ) );
+      add_submenu_page( 'when-last-login-settings', __('Add Ons', 'when-last-login'), __('Add Ons', 'when-last-login'), 'manage_options', 'admin.php?page=when-last-login-settings&tab=add-ons' );
+    } else {
+       add_submenu_page( 'options-general.php', __( 'When Last Login', 'when-last-login' ), __( 'When Last Login', 'when-last-login' ), 'manage_options', 'when-last-login-settings', array( $this, 'wll_settings_callback' ) );
+    }
+     
       
       do_action( 'wll_settings_admin_menu_item' );
 
@@ -602,7 +724,25 @@ class When_Last_Login {
      * @since 1.0.0
      */
     public function wll_automatically_remove_logs() {
-      global $pagenow;
+        global $pagenow;
+
+        if( !empty( $_GET['wll_records_action'] ) && $_GET['wll_records_action'] == 'delete' ){
+
+          if( isset( $_GET['wll_record'] ) ){            
+            foreach( $_GET['wll_record'] as $key => $val ){
+              $this->delete_record( intval( $val ) );
+            }
+          }
+
+        }
+
+        if( !empty( $_GET['action'] ) && $_GET['action'] == 'delete_records' ){
+
+          if( isset( $_GET['record'] ) ){
+            $this->delete_record( intval( $_GET['record'] ) );
+          }
+
+        }
 
         // Bail if not on our settings page.
         if ( 'admin.php' == $pagenow && 'when-last-login-settings' != $_GET['page'] ) {
@@ -610,59 +750,122 @@ class When_Last_Login {
         }
 
         global $wpdb;
-      
-        $sql = "DELETE p, pm FROM $wpdb->posts p LEFT JOIN $wpdb->postmeta pm ON pm.post_id = p.ID WHERE p.post_type = 'wll_records'";
 
-        if ( isset( $_REQUEST['remove_all_wll_records'] ) ) {
+        if( !empty( $_GET['clearout'] ) && $_GET['clearout'] == 'version2' ){
 
-          $nonce = $_REQUEST['wll_remove_all_records_nonce'];
-          if ( wp_verify_nonce( $nonce, 'wll_remove_all_records_nonce' ) ) {
+            $login_records = $wpdb->prefix.'wll_login_records';
 
-            if ( $wpdb->query( $sql ) > 0 ) {
-              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
-            } else {
-              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+            $sql = "DELETE FROM ".$login_records;
+
+            if ( isset( $_REQUEST['remove_all_wll_records'] ) ) {
+                $nonce = $_REQUEST['wll_remove_all_records_nonce'];
+                if ( wp_verify_nonce( $nonce, 'wll_remove_all_records_nonce' ) ) {
+                    if ( $wpdb->query( $sql ) > 0 ) {
+                        add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+                    } else {
+                        add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+                    }
+                } else {
+                    die( 'nonce not valid.' );
+                }
             }
-          } else {
-            die( 'nonce not valid.' );
-          }
-        }
 
-        if ( isset( $_REQUEST['remove_wll_records'] ) ) {
-
-          $nonce = $_REQUEST['wll_remove_records_nonce'];
-          if ( wp_verify_nonce( $nonce, 'wll_remove_records_nonce' ) ) {
-
-            $date = apply_filters( 'wll_automatically_remove_logs_date', date( 'Y-m-d', strtotime( '-3 months' ) ) );
-
-            $sql .= " AND p.post_date <= '$date'";
-
-            if ( $wpdb->query( $sql ) > 0 ) {
-              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
-            } else {
-              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+            if ( isset( $_REQUEST['remove_wll_records'] ) ) {
+                $nonce = $_REQUEST['wll_remove_records_nonce'];
+                if ( wp_verify_nonce( $nonce, 'wll_remove_records_nonce' ) ) {
+                    $date = apply_filters( 'wll_automatically_remove_logs_date', date( 'Y-m-d', strtotime( '-3 months' ) ) );
+                    $sql .= " WHERE date <= '$date'";
+                    if ( $wpdb->query( $sql ) > 0 ) {
+                        add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+                    } else {
+                        add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+                    }
+                } else {
+                    die( 'nonce not valid.' );
+                } 
             }
-          } else {
-            die( 'nonce not valid.' );
-          } 
-        }
 
-        if ( isset( $_REQUEST['remove_wll_ip_addresses'] ) ) {
-
-          $nonce = $_REQUEST['wll_remove_ip_nonce'];
-          if ( wp_verify_nonce( $nonce, 'wll_remove_ip_nonce' ) ) {
-
-            $sql = "DELETE FROM $wpdb->usermeta WHERE meta_key = 'wll_user_ip_address'";
-
-            if ( $wpdb->query( $sql ) > 0 ) {
-              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
-            } else {
-              add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+            if ( isset( $_REQUEST['remove_wll_ip_addresses'] ) ) {
+                $nonce = $_REQUEST['wll_remove_ip_nonce'];
+                if ( wp_verify_nonce( $nonce, 'wll_remove_ip_nonce' ) ) {
+                    $records = $this->get_records();
+                    $login_records = $wpdb->prefix.'wll_login_records';
+                    $failed = false;
+                    if( !empty( $records ) ){
+                        foreach( $records as $r ){
+                            $updated = $wpdb->query( "UPDATE ".$login_records." SET `ip` = '' WHERE `id` = '".$r->id."'");
+                            if( !$updated ){
+                                $failed = true;
+                            }
+                        }
+                    }
+                    if ( $failed ) {
+                        add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+                    } else {
+                        add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+                    }
+                } else {
+                    die( 'nonce not valid.' );
+                }
             }
-          } else {
-            die( 'nonce not valid.' );
-          }
+
+        } else {
+
+            $sql = "DELETE p, pm FROM $wpdb->posts p LEFT JOIN $wpdb->postmeta pm ON pm.post_id = p.ID WHERE p.post_type = 'wll_records'";
+
+            if ( isset( $_REQUEST['remove_all_wll_records'] ) ) {
+
+              $nonce = $_REQUEST['wll_remove_all_records_nonce'];
+              if ( wp_verify_nonce( $nonce, 'wll_remove_all_records_nonce' ) ) {
+
+                if ( $wpdb->query( $sql ) > 0 ) {
+                  add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+                } else {
+                  add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+                }
+              } else {
+                die( 'nonce not valid.' );
+              }
+            }
+
+            if ( isset( $_REQUEST['remove_wll_records'] ) ) {
+
+              $nonce = $_REQUEST['wll_remove_records_nonce'];
+              if ( wp_verify_nonce( $nonce, 'wll_remove_records_nonce' ) ) {
+
+                $date = apply_filters( 'wll_automatically_remove_logs_date', date( 'Y-m-d', strtotime( '-3 months' ) ) );
+
+                $sql .= " AND p.post_date <= '$date'";
+
+                if ( $wpdb->query( $sql ) > 0 ) {
+                  add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+                } else {
+                  add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+                }
+              } else {
+                die( 'nonce not valid.' );
+              } 
+            }
+
+            if ( isset( $_REQUEST['remove_wll_ip_addresses'] ) ) {
+
+              $nonce = $_REQUEST['wll_remove_ip_nonce'];
+              if ( wp_verify_nonce( $nonce, 'wll_remove_ip_nonce' ) ) {
+
+                $sql = "DELETE FROM $wpdb->usermeta WHERE meta_key = 'wll_user_ip_address'";
+
+                if ( $wpdb->query( $sql ) > 0 ) {
+                  add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__success' ) );
+                } else {
+                  add_action( 'admin_notices', array( $this, 'wll_remove_records_notice__warning' ) );
+                }
+              } else {
+                die( 'nonce not valid.' );
+              }
+            }
+
         }
+              
     }
 
 
