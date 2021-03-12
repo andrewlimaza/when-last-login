@@ -133,15 +133,14 @@ class When_Last_Login {
         }
 
         if( $current_version == 1.2 ){
-
-            $this->create_records_table();
-            $this->migrate_records();
+            self::create_records_table();
+            self::migrate_records();
 
             update_option( 'wll_current_version', 2.0 );
         }
     }
 
-    function create_records_table(){
+    public static function create_records_table(){
 
         global $wpdb;
 
@@ -154,7 +153,7 @@ class When_Last_Login {
 
     }
 
-    function migrate_records(){
+    public static function migrate_records(){
 
         $args = array(
             'post_type' => 'wll_records',
