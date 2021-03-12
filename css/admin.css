@@ -41,3 +41,15 @@
 	}
 
 }
+
+table.wp-list-table.striped.widefat{
+	border: none;
+}
+
+.postbox .inside {
+    margin: 0px 0;
+}
+
+a {
+	text-decoration: none;
+}
