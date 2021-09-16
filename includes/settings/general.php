@@ -40,67 +40,38 @@
 					window.location.href = "<?php echo add_query_arg( array( 'remove_wll_records' => '1', 'wll_remove_records_nonce' => $remove_records_nonce ), admin_url( 'admin.php?page=when-last-login-settings' ) ); ?>";
 				}
 			}
+
 			function wll_remove_all_records(){
 				if( window.confirm('<?php echo $all_records_message; ?>')) {
 					window.location.href = "<?php echo add_query_arg( array( 'remove_all_wll_records' => '1', 'wll_remove_all_records_nonce' => $remove_all_records_nonce ), admin_url( 'admin.php?page=when-last-login-settings' ) ); ?>";
 				}
 			}
+
 			function wll_remove_all_ips(){
 				if( window.confirm('<?php echo $all_ip_message; ?>')) {
 					window.location.href = "<?php echo add_query_arg( array( 'remove_wll_ip_addresses' => '1', 'wll_remove_ip_nonce' => $remove_ip_nonce ), admin_url( 'admin.php?page=when-last-login-settings' ) ); ?>";
 				}
 			}
-
-
-			function wll_remove_old_records_v2(){
-				if( window.confirm('<?php echo $old_records_message; ?>')) {
-					window.location.href = "<?php echo add_query_arg( array( 'remove_wll_records' => '1', 'wll_remove_records_nonce' => $remove_records_nonce, 'clearout' => 'version2' ), admin_url( 'admin.php?page=when-last-login-settings' ) ); ?>";
-				}
-			}
-			function wll_remove_all_records_v2(){
-				if( window.confirm('<?php echo $all_records_message; ?>')) {
-					window.location.href = "<?php echo add_query_arg( array( 'remove_all_wll_records' => '1', 'wll_remove_all_records_nonce' => $remove_all_records_nonce, 'clearout' => 'version2' ), admin_url( 'admin.php?page=when-last-login-settings' ) ); ?>";
-				}
-			}
-			function wll_remove_all_ips_v2(){
-				if( window.confirm('<?php echo $all_ip_message; ?>')) {
-					window.location.href = "<?php echo add_query_arg( array( 'remove_wll_ip_addresses' => '1', 'wll_remove_ip_nonce' => $remove_ip_nonce, 'clearout' => 'version2' ), admin_url( 'admin.php?page=when-last-login-settings' ) ); ?>";
-				}
-			}
 	</script>
 
 	<tr>
-		<th><?php _e( 'Clear old logs (Version 2)', 'when-last-login' ); ?></th>
-		<td><a href="javascript:void(0);" onclick="wll_remove_old_records_v2(); return false;" class="button-primary"><?php _e( 'Run Now', 'when-last-login' ); ?></a></td>
-	</tr>
-	<tr>
-		<th><?php _e( 'Clear all logs (Version 2)', 'when-last-login' ); ?></th>
-		<td><a href="javascript:void(0);" onclick="wll_remove_all_records_v2(); return false;" class="button-primary"><?php _e( 'Run Now', 'when-last-login' ); ?></a></td>
-	</tr>
-	<tr>
-		<th><?php _e( 'Clear all IP Addresses (Version 2)', 'when-last-login' ); ?></th>
-		<td><a href="javascript:void(0);" onclick="wll_remove_all_ips_v2(); return false;" class="button-primary"><?php _e( 'Run Now', 'when-last-login' ); ?></a></td>
-	</tr>
-	<tr>
-		<td colspan='2'><hr/></td>
+		<th><?php esc_html_e( 'Clear old logs', 'when-last-login' ); ?></th>
+		<td><a href="javascript:void(0);" onclick="wll_remove_old_records(); return false;" class="button-primary"><?php esc_html_e( 'Run Now', 'when-last-login' ); ?></a></td>
 	</tr>
 
 	<tr>
-		<th><?php _e( 'Clear old logs (Version 1)', 'when-last-login' ); ?></th>
-		<td><a href="javascript:void(0);" onclick="wll_remove_old_records(); return false;" class="button-primary"><?php _e( 'Run Now', 'when-last-login' ); ?></a></td>
+		<th><?php esc_html_e( 'Clear all logs', 'when-last-login' ); ?></th>
+		<td><a href="javascript:void(0);" onclick="wll_remove_all_records(); return false;" class="button-primary"><?php esc_html_e( 'Run Now', 'when-last-login' ); ?></a></td>
 	</tr>
+
 	<tr>
-		<th><?php _e( 'Clear all logs (Version 1)', 'when-last-login' ); ?></th>
-		<td><a href="javascript:void(0);" onclick="wll_remove_all_records(); return false;" class="button-primary"><?php _e( 'Run Now', 'when-last-login' ); ?></a></td>		
-	</tr>
-  <tr>
-		<th><?php _e( 'Clear all IP Addresses (Version 1)', 'when-last-login' ); ?></th>
-		<td><a href="javascript:void(0);" onclick="wll_remove_all_ips(); return false;" class="button-primary"><?php _e( 'Run Now', 'when-last-login' ); ?></a></td>
+		<th><?php esc_html_e( 'Clear all IP Addresses', 'when-last-login' ); ?></th>
+		<td><a href="javascript:void(0);" onclick="wll_remove_all_ips(); return false;" class="button-primary"><?php esc_html_e( 'Run Now', 'when-last-login' ); ?></a></td>
 	</tr>
 
 	<tr>
 		<input type="hidden" name="_nonce" value="<?php echo wp_create_nonce( 'wll_settings_nonce' ); ?>">
-	    <th><input type="submit" name="wll_save_settings"  class="button-primary" value="<?php esc_html_e('Save Settings', 'when-last-login'); ?>" /></th>
+	    <th><input type="submit" name="wll_save_settings"  class="button-primary" value="<?php esc_attr_e('Save Settings', 'when-last-login'); ?>" /></th>
 	    <td></td>
 	</tr>
 </table>
