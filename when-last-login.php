@@ -446,7 +446,7 @@ class When_Last_Login {
                     </tr>                      
                     <?php
 
-                    $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'DESC', 'oderby' => 'meta_value', 'number' => apply_filters( 'wll_top_widget_user_count', 3 ), 'blog_id' => $blog_id, 'role__not_in' => 'Administrator' ) );
+                    $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'DESC', 'orderby' => 'meta_value', 'number' => apply_filters( 'wll_top_widget_user_count', 3 ), 'blog_id' => $blog_id, 'role__not_in' => 'Administrator' ) );
 
                     $topusers = $user_query->get_results();
 
@@ -496,7 +496,7 @@ class When_Last_Login {
 
             <?php
 
-            $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'DESC', 'oderby' => 'meta_value', 'number' => apply_filters( 'wll_top_widget_user_count', 3 ), 'role__not_in' => 'Administrator' ) );
+            $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'DESC', 'orderby' => 'meta_value', 'number' => apply_filters( 'wll_top_widget_user_count', 3 ), 'role__not_in' => 'Administrator' ) );
 
             $topusers = $user_query->get_results();
 
