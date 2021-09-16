@@ -15,7 +15,9 @@ $tabs = apply_filters( 'wll_settings_page_tabs', $tabs );
 
 ?>
 
-<img src="<?php echo WLL_PLUGIN . '/includes/images/whenlastlogin.png'; ?>" width="300px" height="auto" style="margin-top:2%;"/>
+<div id="wll-setting-header">
+	<img src="<?php echo WLL_PLUGIN . '/includes/images/whenlastlogin.png'; ?>" width="300px" height="auto" style="margin-top:2%;"/><span style="position:relative;top:-15px;"><?php echo 'v' . WLL_VER; ?></span>
+</div>
 <div class='wrap'>
 
 	<h2 class="nav-tab-wrapper"><?php

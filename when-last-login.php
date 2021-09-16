@@ -12,6 +12,8 @@ Domain Path: /languages
 
 use geertw\IpAnonymizer\IpAnonymizer;
 
+define( 'WLL_VER', '1.2.0' );
+
 class When_Last_Login {
 
     /** Refers to a single instance of this class. */
