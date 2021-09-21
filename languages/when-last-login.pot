@@ -9,28 +9,11 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-09-21T19:11:38+00:00\n"
+"POT-Creation-Date: 2021-09-21T19:11:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: when-last-login\n"
 
-#: when-last-login.php:66
-#: when-last-login.php:111
-#: when-last-login.php:445
-#: when-last-login.php:509
-msgid "Last Login"
-msgstr "Ultimo accesso"
-
-#: when-last-login.php:81
-#: when-last-login.php:84
-#: when-last-login.php:125
-#: when-last-login.php:467
-#: when-last-login.php:470
-#: when-last-login.php:524
-msgid "Never"
-msgstr "Mai"
-
-#. Plugin Name of the plugin/theme
 #. Plugin Name of the plugin
 #: includes/privacy-policy.php:41
 #: includes/privacy-policy.php:53
@@ -39,21 +22,8 @@ msgstr "Mai"
 msgid "When Last Login"
 msgstr ""
 
-#. Plugin URI of the plugin/theme
 #. Plugin URI of the plugin
 msgid "https://wordpress.org/plugins/when-last-login/"
-msgstr ""
-
-#. Description of the plugin/theme
-msgid "Adds functionality to your WordPress install to show when a user last logged in."
-msgstr "Aggiunge funzionalità al vostro WordPress installare per mostrare quando un utente effettuato l'ultimo accesso."
-
-#. Author of the plugin/theme
-msgid "Arctek Technologies (Pty) Ltd"
-msgstr ""
-
-#. Author URI of the plugin/theme
-msgid "http://www.whenlastlogin.com"
 msgstr ""
 
 #. Description of the plugin
@@ -287,9 +257,20 @@ msgstr ""
 msgid "View Login Records"
 msgstr ""
 
+#: when-last-login.php:445
+#: when-last-login.php:509
+msgid "Last Login"
+msgstr ""
+
 #: when-last-login.php:448
 #: when-last-login.php:670
 msgid "IP Address"
+msgstr ""
+
+#: when-last-login.php:467
+#: when-last-login.php:470
+#: when-last-login.php:524
+msgid "Never"
 msgstr ""
 
 #: when-last-login.php:478
