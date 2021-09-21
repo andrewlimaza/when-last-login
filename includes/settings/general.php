@@ -15,7 +15,10 @@
 	<?php if( isset( $settings['show_all_login_records'] ) && intval( $settings['show_all_login_records'] ) == 1 ){ $checked = 1; } else { $checked = 0; } ?>
 	<tr>
 		<th><?php esc_html_e('Enable "All Login Records"', 'when-last-login'); ?></th>
-		<td><input type='checkbox' value='1' name='wll_all_login_records' <?php checked( 1, $checked ); ?>/></td>
+		<td><input type='checkbox' value='1' name='wll_all_login_records' <?php checked( 1, $checked ); ?>/>			<small><?php 
+			echo esc_html( 'Please enable this option if using the', 'when-last-login' ) . " <a href='https://yoohooplugins.com/plugins/when-last-login-user-statistics/' target='_blank'><strong>" . esc_html( 'When Last Login - User Statistics Add On', 'when-last-login' ) . "</strong></a>";
+		?></small></td>
+</td>
 	</tr>
 
 	<tr>
