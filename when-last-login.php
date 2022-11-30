@@ -167,7 +167,7 @@ class When_Last_Login {
           while( $the_query->have_posts() ){
             $the_query->the_post();
 
-            $recorded = $this->record_login( get_the_title(), get_the_author(), 'publish', get_the_date() );
+            $recorded = self::record_login( get_the_title(), get_the_author(), 'publish', get_the_date() );
 
             $stored_ip = get_post_meta( get_the_ID(), 'wll_user_ip_address', true );
 
@@ -180,7 +180,7 @@ class When_Last_Login {
 
     }
 
-    function record_login( $title, $author, $status, $date ){
+    public function record_login( $title, $author, $status, $date ){
 
         global $wpdb;        
 
@@ -204,7 +204,7 @@ class When_Last_Login {
 
     }
 
-    function record_ip( $id, $ip ){
+    public function record_ip( $id, $ip ){
 
         global $wpdb;
 
@@ -339,7 +339,7 @@ class When_Last_Login {
       }
     }
 
-     public static function last_login( $user_login, $users ){
+    public function last_login( $user_login, $users ){
 
       global $show_login_records;
 
@@ -430,6 +430,8 @@ class When_Last_Login {
             return;
         }
 
+        $current_version = floatval( get_option( 'wll_current_version' ) );
+
         if( is_network_admin() ){
 
             $sites = get_sites();
@@ -485,8 +487,15 @@ class When_Last_Login {
 
                 <a href="<?php echo admin_url( 'users.php?orderby=when_last_login&order=desc' ); ?>"><?php _e( 'View All Users', 'when-last-login' ); ?></a>
 
-                <?php if( $show_login_records == true ){ ?>
-                    <a style="float:right" href="<?php echo admin_url( 'edit.php?post_type=wll_records' ); ?>"><?php _e( 'View Login Records', 'when-last-login' ); } //end the if filter check here ?></a>
+                <?php if( $show_login_records == true ){ 
+
+                     if( $current_version >= 1.2 ) {
+                        $login_record_url = 'admin.php?page=all-login-records';
+                    } else {
+                        $login_record_url = 'edit.php?post_type=wll_records';    
+                    }
+                    ?>
+                    <a style="float:right" href="<?php echo admin_url( $login_record_url ); ?>"><?php _e( 'View Login Records', 'when-last-login' ); } //end the if filter check here ?></a>
                 <?php                
                     
             }
@@ -533,8 +542,17 @@ class When_Last_Login {
 
         <a href="<?php echo admin_url( 'users.php?orderby=when_last_login&order=desc' ); ?>"><?php esc_html_e( 'View All Users', 'when-last-login' ); ?></a>
 
-        <?php if( $show_login_records == true ){ ?>
-            <a style="float:right" href="<?php echo admin_url( 'edit.php?post_type=wll_records' ); ?>"><?php esc_html_e( 'View Login Records', 'when-last-login' ); } //end the if filter check here ?></a>
+        <?php if( $show_login_records == true ){             
+            
+            if( $current_version >= 1.2 ) {
+                $login_record_url = 'admin.php?page=all-login-records';
+            } else {
+                $login_record_url = 'edit.php?post_type=wll_records';    
+            }
+            
+            ?>
+           
+            <a style="float:right" href="<?php echo admin_url( $login_record_url ); ?>"><?php esc_html_e( 'View Login Records', 'when-last-login' ); } //end the if filter check here ?></a>
         <?php    
         }
         
