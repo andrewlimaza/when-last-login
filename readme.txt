@@ -2,10 +2,10 @@
 Contributors: andrewza, yoohooplugins, travislima
 Tags: last login, user login, user login time, last logged in, last seen, user last seen, WordPress last login plugin, last login plugin, last seen plugin, when last login, when last user login, when last user seen, last login WordPress
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4GC4JEZH7KSKL
-Requires at least: 4.0
-Tested up to: 5.3
-Requires PHP: 5.6
-Stable tag: 1.1
+Requires at least: 5.0
+Tested up to: 6.1
+Requires PHP: 7.2
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,7 +93,11 @@ Add the following snippet of code to your theme's functions.php or custom plugin
 
 == Changelog ==
 
+= 1.2.1 - 2021-09-21 =
+* Enhancement: Removed admin users from being tracked in WLL dashboard statistics.
+* Bug Fix: Issue with order by not correctly set in the dashboard statistics.
 = 1.2 =
+
 * Security: Added nonces to settings page.
 * Enhancement: Moved notice from all dashboard pages to only show on dashboard page.
 * Enhancement: All login records functionality improvement to support PHP 7.4 - Thanks [@walle98](https://github.com/walle89)
@@ -152,6 +156,12 @@ Add the following snippet of code to your theme's functions.php or custom plugin
 * First Release
 
 == Upgrade Notice ==
+= 1.2.2 =
+* Upgrade for minor security and bug improvements.
+
+= 1.2.1 =
+* Upgrade to get bug fixes and new improvements to When Last Login.
+
 = 1.2 =
 * Version 1.2 includes security improvements and minor code improvements.
 
