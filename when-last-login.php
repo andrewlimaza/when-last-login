@@ -46,8 +46,6 @@ class When_Last_Login {
       add_action( 'admin_notices', array( $this, 'update_notice' ) );
 
       add_action( 'wp_ajax_wll_hide_subscription_notice', array( $this, 'wll_hide_subscription_notice' ) );
-      add_action( 'wp_ajax_wll_subscribe_user_newsletter', array( $this, 'wll_subscribe_user_newsletter_callback' ) );
-
 
       //Setting up columns.
       add_filter( 'manage_users_columns', array( $this, 'column_header'), 10, 1 );
@@ -142,44 +140,20 @@ class When_Last_Login {
     }
 
     public function wll_hide_subscription_notice(){
-      update_option( 'wll_notice_hide', '1' );
-    }
-
-    public function wll_subscribe_user_newsletter_callback(){
-
-      if( isset( $_POST['action'] ) && sanitize_text_field( $_POST['action'] ) == 'wll_subscribe_user_newsletter' ){
-
-        if( isset( $_POST['email'] ) && sanitize_email( $_POST['email'] ) != "" ){
-
-          $request = wp_remote_post( 'https://yoohooplugins.com/api/mailing_list/subscribe.php', array( 'body' => array( 'action' => 'subscribe_newsletter', 'email' => $_POST['email'] ) ) );
-
-          if( !is_wp_error( $request ) ){
-            $request_body = wp_remote_retrieve_body( $request );
-
-            if( $request_body == 'subscribed' ){
-              echo '1';
-              update_option( 'wll_notice_hide', '1' );
-            }
-
-          } else {
-
-          }
-
-        } else {
-
-          _e( 'Please enter in an email address to subscribe to our mailing list and receive your coupon', 'when-last-login' );
-
-        }
-
+    if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'wll_hide_notice_nonce' ) ) {
+        wp_die( __( 'Nonce is invalid', 'pmpro-pdf-invoices' ) );
       }
-
-      wp_die();
-
+      update_option( 'wll_notice_hide', '1' );
     }
 
     public static function load_js_for_notice(){
       if( get_option( 'wll_notice_hide' ) !== '1'){
         wp_enqueue_script( 'wll_notice_update', plugins_url( 'js/notice-update.js', __FILE__ ), array( 'jquery' ), '1.0', false );
+
+        wp_localize_script( 'wll_notice_update', 'wll_notice_update', array(
+          		'ajaxurl' => admin_url( 'admin-ajax.php' ),
+              'nonce' => wp_create_nonce( 'wll_hide_notice_nonce' )
+        ) );
       }
       if( isset( $_GET['page'] ) && $_GET['page'] == 'when-last-login-settings' ){
         wp_enqueue_style( 'wll_admin_settings_styles', plugins_url( '/css/admin.css', __FILE__ ) );
@@ -342,7 +316,7 @@ class When_Last_Login {
                     </tr>                      
                     <?php
 
-                    $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'DESC', 'orderby' => 'meta_value_num', 'number' => apply_filters( 'wll_top_widget_user_count', 3 ), 'blog_id' => $blog_id, 'role__not_in' => 'Administrator' ) );
+                    $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'DESC', 'orderby' => 'meta_value_num', 'number' => apply_filters( 'wll_top_widget_user_count', 3 ), 'blog_id' => $blog_id, 'role__not_in' => array( 'administrator' ) ) );
 
                     $topusers = $user_query->get_results();
 
@@ -392,7 +366,7 @@ class When_Last_Login {
 
             <?php
 
-            $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'DESC', 'orderby' => 'meta_value_num', 'number' => apply_filters( 'wll_top_widget_user_count', 3 ), 'role__not_in' => 'Administrator'  ) );
+            $user_query = new WP_User_Query( array( 'meta_key' => 'when_last_login_count', 'meta_value' => 0, 'meta_compare' => '!=', 'order' => 'DESC', 'orderby' => 'meta_value_num', 'number' => apply_filters( 'wll_top_widget_user_count', 3 ), 'role__not_in' => array( 'administrator' ) ) );
 
             $topusers = $user_query->get_results();
 
