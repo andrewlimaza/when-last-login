@@ -164,22 +164,30 @@ class When_Last_Login {
 
       global $show_login_records;
 
-       //get/update user meta 'when_last_login' on login and add time() to it.
-       update_user_meta( $users->ID, 'when_last_login', time() );
+      $record_login = apply_filters( 'wll_record_login', true, $users, $user_login );
 
-       //get and update user meta 'when_last_login_count' on login for # of login counts. Thanks to Jarryd Long (@jarrydlong) for the assistance
-       $wll_count = get_user_meta( $users->ID, 'when_last_login_count', true );
+      // If filter isn't true, don't record login at all!
+      if ( ! $record_login ) {
+        return;
+      }
 
-       if( $wll_count === false ){
-         update_user_meta($users->ID, 'when_last_login_count', 1);
-       } else {
-         $wll_new_value = intval($wll_count);
-         $wll_new_value = $wll_new_value + 1;
+      //get/update user meta 'when_last_login' on login and add time() to it.
+      update_user_meta( $users->ID, 'when_last_login', time() );
 
-         update_user_meta($users->ID, 'when_last_login_count', $wll_new_value);
-       }
-       if( $show_login_records == true ){
-       $args = array(
+      //get and update user meta 'when_last_login_count' on login for # of login counts. Thanks to Jarryd Long (@jarrydlong) for the assistance
+      $wll_count = get_user_meta( $users->ID, 'when_last_login_count', true );
+
+      if( $wll_count === false ){
+        update_user_meta($users->ID, 'when_last_login_count', 1);
+      } else {
+        $wll_new_value = intval($wll_count);
+        $wll_new_value = $wll_new_value + 1;
+
+        update_user_meta($users->ID, 'when_last_login_count', $wll_new_value);
+      }
+
+      if( $show_login_records == true ){
+        $args = array(
           'post_title'    => $users->data->display_name . __( ' has logged in at ', 'when-last-login' ) . date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ),
           'post_status'   => 'publish',
           'post_author'   => $users->ID,
@@ -190,21 +198,21 @@ class When_Last_Login {
 
       }
 
-        $wll_settings = get_option( 'wll_settings' );
+      $wll_settings = get_option( 'wll_settings' );
 
-        if( isset( $wll_settings['record_ip_address'] ) && intval( $wll_settings['record_ip_address'] ) == 1 ){
+      if( isset( $wll_settings['record_ip_address'] ) && intval( $wll_settings['record_ip_address'] ) == 1 ){
 
-          // call function to anonymize here.
-          $ip = When_Last_Login::wll_get_user_ip_address();
+        // call function to anonymize here.
+        $ip = When_Last_Login::wll_get_user_ip_address();
 
-          if ( ! empty( $post_id ) ) {
-            update_post_meta( $post_id, 'wll_user_ip_address', $ip );
-          }
-          
-            update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
+        if ( ! empty( $post_id ) ) {
+          update_post_meta( $post_id, 'wll_user_ip_address', $ip );
         }
+        
+          update_user_meta( $users->ID, 'wll_user_ip_address', $ip );
+      }
 
-        do_action( 'wll_logged_in_action', array( 'login_count' => $wll_new_value, 'user' => $users ), $wll_settings );
+      do_action( 'wll_logged_in_action', array( 'login_count' => $wll_new_value, 'user' => $users ), $wll_settings );
 
      }
 
